@@ -1,4 +1,4 @@
-import { AlertTriangle, ArrowUpRight, ArrowDownRight, DollarSign } from 'lucide-react';
+import { AlertTriangle, ArrowUpRight, ArrowDownRight, DollarSign, Copy, ExternalLink, ChevronDown } from 'lucide-react';
 import { useState } from 'react';
 
 interface LiquidityGap {
@@ -40,11 +40,30 @@ const liquidityGaps: LiquidityGap[] = [
 export function ActionDeck() {
   const [positionSize, setPositionSize] = useState<'conservative' | 'aggressive'>('conservative');
   const [portfolioValue] = useState(250000);
+  const [showBrokerDropdown, setShowBrokerDropdown] = useState(false);
+  const [copiedOrder, setCopiedOrder] = useState(false);
 
   const conservativeSize = portfolioValue * 0.015; // 1.5%
   const conservativeRange = `1-3%`;
   const aggressiveSize = portfolioValue * 0.07; // 7%
   const aggressiveRange = `6-8%`;
+
+  const currentPrice = 342.18;
+  const shares = Math.floor(
+    (positionSize === 'conservative' ? conservativeSize : aggressiveSize) / currentPrice
+  );
+
+  const handleCopyOrder = (action: 'buy' | 'sell') => {
+    const orderText = `${action.toUpperCase()} ${shares} shares of AXON at $${currentPrice}`;
+    navigator.clipboard.writeText(orderText);
+    setCopiedOrder(true);
+    setTimeout(() => setCopiedOrder(false), 2000);
+  };
+
+  const brokers = [
+    { name: 'ThinkOrSwim', url: 'https://www.thinkorswim.com', logo: '🔷' },
+    { name: 'Interactive Brokers', url: 'https://www.interactivebrokers.com', logo: '🔶' },
+  ];
 
   return (
     <div className="space-y-6">
@@ -111,12 +130,12 @@ export function ActionDeck() {
 
       {/* Trade Setup Widget */}
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-        <div className="p-5 border-b border-slate-200 bg-gradient-to-br from-indigo-50 to-white">
+        <div className="p-4 sm:p-5 border-b border-slate-200 bg-gradient-to-br from-indigo-50 to-white">
           <h3 className="text-slate-900 mb-1">Trade Setup</h3>
           <p className="text-sm text-slate-500">Position sizing for AXON</p>
         </div>
 
-        <div className="p-5">
+        <div className="p-4 sm:p-5">
           {/* Portfolio Value */}
           <div className="mb-6 p-4 bg-slate-50 rounded-lg">
             <div className="text-xs text-slate-500 mb-1">Portfolio Value</div>
@@ -170,15 +189,12 @@ export function ActionDeck() {
             <div className="pt-4 border-t border-slate-200">
               <div className="flex items-center justify-between text-sm mb-2">
                 <span className="text-slate-600">Current Price</span>
-                <span className="text-slate-900">$342.18</span>
+                <span className="text-slate-900">${currentPrice}</span>
               </div>
               <div className="flex items-center justify-between text-sm">
                 <span className="text-slate-600">Shares to Buy</span>
                 <span className="text-slate-900">
-                  {Math.floor(
-                    (positionSize === 'conservative' ? conservativeSize : aggressiveSize) / 342.18
-                  )}{' '}
-                  shares
+                  {shares} shares
                 </span>
               </div>
             </div>
@@ -186,14 +202,52 @@ export function ActionDeck() {
 
           {/* Action Buttons */}
           <div className="space-y-3">
-            <button className="w-full py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg hover:from-green-700 hover:to-green-800 transition-all shadow-sm flex items-center justify-center gap-2">
-              <ArrowUpRight className="w-4 h-4" />
-              <span>Buy AXON</span>
+            <button 
+              onClick={() => handleCopyOrder('buy')}
+              className="w-full py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg hover:from-green-700 hover:to-green-800 transition-all shadow-sm flex items-center justify-center gap-2"
+            >
+              <Copy className="w-4 h-4" />
+              <span>{copiedOrder ? 'Order Copied!' : 'Copy Buy Order'}</span>
             </button>
-            <button className="w-full py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg hover:from-red-700 hover:to-red-800 transition-all shadow-sm flex items-center justify-center gap-2">
-              <ArrowDownRight className="w-4 h-4" />
-              <span>Sell AXON</span>
+            <button 
+              onClick={() => handleCopyOrder('sell')}
+              className="w-full py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg hover:from-red-700 hover:to-red-800 transition-all shadow-sm flex items-center justify-center gap-2"
+            >
+              <Copy className="w-4 h-4" />
+              <span>{copiedOrder ? 'Order Copied!' : 'Copy Sell Order'}</span>
             </button>
+
+            {/* Broker Link Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setShowBrokerDropdown(!showBrokerDropdown)}
+                className="w-full py-3 bg-white border-2 border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-all flex items-center justify-center gap-2"
+              >
+                <ExternalLink className="w-4 h-4" />
+                <span>Open in Broker</span>
+                <ChevronDown className={`w-4 h-4 transition-transform ${showBrokerDropdown ? 'rotate-180' : ''}`} />
+              </button>
+
+              {/* Dropdown Menu */}
+              {showBrokerDropdown && (
+                <div className="absolute bottom-full left-0 right-0 mb-2 bg-white rounded-lg shadow-lg border border-slate-200 overflow-hidden z-10">
+                  {brokers.map((broker) => (
+                    <a
+                      key={broker.name}
+                      href={broker.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 transition-colors"
+                      onClick={() => setShowBrokerDropdown(false)}
+                    >
+                      <span className="text-xl">{broker.logo}</span>
+                      <span className="text-sm text-slate-900">{broker.name}</span>
+                      <ExternalLink className="w-3 h-3 text-slate-400 ml-auto" />
+                    </a>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Risk Indicator */}

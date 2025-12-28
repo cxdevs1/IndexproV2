@@ -1,5 +1,6 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { CheckCircle2, XCircle, AlertCircle, TrendingUp } from 'lucide-react';
+import { CheckCircle2, XCircle, AlertCircle, TrendingUp, ShieldAlert, ShieldCheck } from 'lucide-react';
+import { useState } from 'react';
 
 const scoreData = [
   { date: 'Jan 15', score: 72 },
@@ -15,6 +16,17 @@ const scoreData = [
   { date: 'Mar 25', score: 91 },
   { date: 'Apr 1', score: 94 },
 ];
+
+// Helper to find when score first crossed 70
+const firstCross70Date = (() => {
+  for (let i = 1; i < scoreData.length; i++) {
+    if (scoreData[i].score >= 70 && scoreData[i - 1].score < 70) {
+      return scoreData[i].date;
+    }
+  }
+  // If first point is already above 70, mark it
+  return scoreData[0].score >= 70 ? scoreData[0].date : null;
+})();
 
 interface ChecklistItem {
   label: string;
@@ -34,54 +46,109 @@ const committeeChecklist: ChecklistItem[] = [
 export function StockIntelligence() {
   const currentStock = 'AXON';
   const currentCompany = 'Axon Enterprise';
+  const thirtyDayMove = 18.5; // Percentage move in last 30 days
+  const [hoveredPoint, setHoveredPoint] = useState<{ date: string; score: number } | null>(null);
+
+  const CustomTooltip = ({ active, payload }: any) => {
+    if (active && payload && payload.length) {
+      const data = payload[0].payload;
+      const firstCrossDate = data.score >= 70 && scoreData[scoreData.indexOf(data) - 1]?.score < 70 
+        ? data.date 
+        : null;
+
+      return (
+        <div className="bg-white p-3 rounded-lg shadow-lg border border-slate-200">
+          <div className="text-sm text-slate-900 mb-1">{data.date}</div>
+          <div className="text-lg text-indigo-600">Score: {data.score}</div>
+          {firstCrossDate && (
+            <div className="text-xs text-green-600 mt-2 pt-2 border-t border-slate-200">
+              ✓ First crossed 70-point threshold
+            </div>
+          )}
+        </div>
+      );
+    }
+    return null;
+  };
 
   return (
     <div className="space-y-6">
       {/* Stock Header Card */}
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+      <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-6">
         <div className="flex items-start justify-between mb-4">
-          <div>
-            <div className="flex items-center gap-3 mb-2">
+          <div className="flex-1">
+            <div className="flex flex-wrap items-center gap-2 mb-2">
               <h2 className="text-slate-900">{currentStock}</h2>
-              <span className="px-3 py-1 bg-green-50 text-green-700 rounded-lg text-sm">
+              <span className="px-2.5 py-1 bg-green-50 text-green-700 rounded-lg text-xs sm:text-sm">
                 Score: 94
               </span>
+              {/* Pre-Run Warning Badge */}
+              {thirtyDayMove > 15 ? (
+                <span className="px-2.5 py-1 bg-red-100 text-red-700 rounded-lg text-xs sm:text-sm flex items-center gap-1.5 border border-red-200">
+                  <ShieldAlert className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">Pre-Run</span>
+                  <span className="sm:hidden">Risk</span>
+                </span>
+              ) : (
+                <span className="px-2.5 py-1 bg-green-100 text-green-700 rounded-lg text-xs sm:text-sm flex items-center gap-1.5 border border-green-200">
+                  <ShieldCheck className="w-3 h-3 sm:w-4 sm:h-4" />
+                  Clear
+                </span>
+              )}
             </div>
-            <p className="text-slate-600">{currentCompany}</p>
-            <p className="text-sm text-slate-500 mt-1">S&P 600 SmallCap</p>
+            <p className="text-sm sm:text-base text-slate-600">{currentCompany}</p>
+            <p className="text-xs sm:text-sm text-slate-500 mt-1">S&P 600 SmallCap</p>
           </div>
-          <div className="text-right">
-            <div className="text-2xl text-slate-900">$342.18</div>
+          <div className="text-right ml-4">
+            <div className="text-xl sm:text-2xl text-slate-900">$342.18</div>
             <div className="flex items-center gap-1 text-green-600 mt-1">
-              <TrendingUp className="w-4 h-4" />
-              <span>+3.2%</span>
-              <span className="text-xs text-slate-500">Today</span>
+              <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="text-sm">+3.2%</span>
+              <span className="text-xs text-slate-500 hidden sm:inline">Today</span>
             </div>
           </div>
         </div>
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-3 gap-4 pt-4 border-t border-slate-100">
+        <div className="grid grid-cols-4 gap-3 sm:gap-4 pt-4 border-t border-slate-100">
           <div>
             <div className="text-xs text-slate-500 mb-1">Market Cap</div>
-            <div className="text-slate-900">$8.2B</div>
+            <div className="text-slate-900 text-sm sm:text-base">$8.2B</div>
           </div>
           <div>
             <div className="text-xs text-slate-500 mb-1">Avg Volume</div>
-            <div className="text-slate-900">42M</div>
+            <div className="text-slate-900 text-sm sm:text-base">42M</div>
           </div>
           <div>
             <div className="text-xs text-slate-500 mb-1">Float</div>
-            <div className="text-slate-900">48%</div>
+            <div className="text-slate-900 text-sm sm:text-base">48%</div>
+          </div>
+          <div>
+            <div className="text-xs text-slate-500 mb-1">30D Move</div>
+            <div className={`text-sm sm:text-base ${thirtyDayMove > 15 ? 'text-red-600' : 'text-green-600'}`}>
+              +{thirtyDayMove}%
+            </div>
           </div>
         </div>
+
+        {/* Risk Warning */}
+        {thirtyDayMove > 15 && (
+          <div className="mt-4 p-3 bg-red-50 rounded-lg border border-red-200">
+            <div className="flex items-center gap-2">
+              <ShieldAlert className="w-4 h-4 text-red-600" />
+              <div className="text-sm text-red-900">
+                High volatility detected: 30-day move exceeds 15% threshold
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Score Persistence Chart */}
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-        <div className="mb-6">
+      <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-6">
+        <div className="mb-4 sm:mb-6">
           <h3 className="text-slate-900 mb-1">Score Persistence</h3>
-          <p className="text-sm text-slate-500">90-day inclusion score trend</p>
+          <p className="text-xs sm:text-sm text-slate-500">90-day inclusion score trend • Hover for threshold dates</p>
         </div>
 
         <ResponsiveContainer width="100%" height={280}>
@@ -90,23 +157,16 @@ export function StockIntelligence() {
             <XAxis
               dataKey="date"
               stroke="#94a3b8"
-              style={{ fontSize: '12px' }}
+              style={{ fontSize: '10px' }}
               tickLine={false}
             />
             <YAxis
               stroke="#94a3b8"
-              style={{ fontSize: '12px' }}
+              style={{ fontSize: '10px' }}
               tickLine={false}
               domain={[0, 100]}
             />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: '#ffffff',
-                border: '1px solid #e2e8f0',
-                borderRadius: '8px',
-                boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
-              }}
-            />
+            <Tooltip content={<CustomTooltip />} />
             <Line
               type="monotone"
               dataKey="score"
