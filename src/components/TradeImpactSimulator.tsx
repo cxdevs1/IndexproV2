@@ -1,6 +1,6 @@
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
-import { TrendingUp, TrendingDown, Target, Sparkles, Info, ArrowUpRight, ArrowDownRight } from 'lucide-react';
-import { useState } from 'react';
+import { TrendingUp, TrendingDown, Target, Sparkles, Info, ArrowUpRight, ArrowDownRight, Wallet, DollarSign } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
 interface HistoricalComp {
   ticker: string;
@@ -22,9 +22,54 @@ export function TradeImpactSimulator() {
   const [indexBuyPressure, setIndexBuyPressure] = useState(250); // millions in AUM
   const [showHistoricalComp, setShowHistoricalComp] = useState(false);
   const [selectedComp, setSelectedComp] = useState(historicalComps[0]);
+  const [tradingCapital, setTradingCapital] = useState(250000);
+  const [tradingCapitalInput, setTradingCapitalInput] = useState('250000');
+  const [saveAsDefault, setSaveAsDefault] = useState(false);
+
+  // Load saved trading capital from localStorage on mount
+  useEffect(() => {
+    const savedCapital = localStorage.getItem('indexPro_tradingCapital');
+    const savedDefault = localStorage.getItem('indexPro_saveAsDefault');
+    
+    if (savedCapital && savedDefault === 'true') {
+      const capital = Number(savedCapital);
+      setTradingCapital(capital);
+      setTradingCapitalInput(capital.toString());
+      setSaveAsDefault(true);
+    }
+  }, []);
+
+  // Save to localStorage when toggle changes
+  useEffect(() => {
+    if (saveAsDefault) {
+      localStorage.setItem('indexPro_tradingCapital', tradingCapital.toString());
+      localStorage.setItem('indexPro_saveAsDefault', 'true');
+    } else {
+      localStorage.removeItem('indexPro_tradingCapital');
+      localStorage.removeItem('indexPro_saveAsDefault');
+    }
+  }, [saveAsDefault, tradingCapital]);
+
+  const handleTradingCapitalChange = (value: string) => {
+    // Remove non-numeric characters except for empty string
+    const numericValue = value.replace(/[^0-9]/g, '');
+    setTradingCapitalInput(numericValue);
+    
+    // Update trading capital if it's a valid number
+    const capital = Number(numericValue);
+    if (capital > 0 || numericValue === '') {
+      setTradingCapital(capital || 0);
+    }
+  };
+
+  const formatCurrency = (value: string) => {
+    if (!value) return '';
+    const num = Number(value);
+    return num.toLocaleString();
+  };
 
   // Calculations
-  const portfolioValue = 250000;
+  const portfolioValue = tradingCapital;
   const positionSize = portfolioValue * (portfolioAllocation / 100);
   const currentPrice = 342.18;
   const shares = Math.floor(positionSize / currentPrice);
@@ -135,6 +180,72 @@ export function TradeImpactSimulator() {
           Position Parameters
         </h4>
 
+        {/* Total Trading Capital Input - Prominent at Top */}
+        <div className="mb-8 p-6 bg-gradient-to-br from-slate-50 to-indigo-50 rounded-xl border-2 border-indigo-200 shadow-sm">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center">
+              <Wallet className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <label className="text-sm text-slate-600">Total Trading Capital</label>
+              <div className="text-xs text-slate-500">Your available capital for trading</div>
+            </div>
+          </div>
+
+          {/* High-contrast Input Box */}
+          <div className="relative mb-4">
+            <div className="absolute inset-y-0 left-0 flex items-center pl-5 pointer-events-none">
+              <DollarSign className="w-6 h-6 text-slate-400" />
+            </div>
+            <input
+              type="text"
+              value={formatCurrency(tradingCapitalInput)}
+              onChange={(e) => handleTradingCapitalChange(e.target.value)}
+              placeholder="Enter trading capital"
+              className="w-full h-16 pl-14 pr-6 text-3xl text-slate-900 bg-white border-2 border-slate-300 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all"
+            />
+          </div>
+
+          {/* Calculated Position Badge */}
+          <div className="flex items-center justify-between p-4 bg-white rounded-lg border border-indigo-200 shadow-sm">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                <Target className="w-4 h-4 text-green-600" />
+              </div>
+              <div>
+                <div className="text-xs text-slate-500">Calculated Position ({portfolioAllocation}%)</div>
+                <div className="text-lg text-slate-900">${positionSize.toLocaleString(undefined, { maximumFractionDigits: 0 })}</div>
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="text-xs text-slate-500 mb-1">Shares</div>
+              <div className="text-lg text-indigo-600">{shares}</div>
+            </div>
+          </div>
+
+          {/* Set as Default Toggle */}
+          <div className="flex items-center justify-between mt-4 p-3 bg-white/60 backdrop-blur-sm rounded-lg border border-slate-200">
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={saveAsDefault}
+                onChange={(e) => setSaveAsDefault(e.target.checked)}
+                id="save-default"
+                className="w-4 h-4 text-indigo-600 bg-white border-slate-300 rounded focus:ring-2 focus:ring-indigo-500 cursor-pointer"
+              />
+              <label htmlFor="save-default" className="text-sm text-slate-700 cursor-pointer select-none">
+                Remember for next session
+              </label>
+            </div>
+            {saveAsDefault && (
+              <div className="flex items-center gap-1 text-xs text-green-600">
+                <div className="w-2 h-2 bg-green-600 rounded-full animate-pulse"></div>
+                Saved
+              </div>
+            )}
+          </div>
+        </div>
+
         {/* Portfolio Allocation Slider */}
         <div className="mb-6">
           <div className="flex items-center justify-between mb-3">
@@ -194,22 +305,6 @@ export function TradeImpactSimulator() {
           <div className="flex justify-between text-xs text-slate-400 mt-2">
             <span>$50M Low</span>
             <span>$500M High</span>
-          </div>
-        </div>
-
-        {/* Quick Stats */}
-        <div className="grid grid-cols-3 gap-3 sm:gap-4 pt-5 border-t border-slate-200">
-          <div className="text-center">
-            <div className="text-xs text-slate-500 mb-1">Position Size</div>
-            <div className="text-base sm:text-lg text-slate-900">${positionSize.toLocaleString(undefined, { maximumFractionDigits: 0 })}</div>
-          </div>
-          <div className="text-center">
-            <div className="text-xs text-slate-500 mb-1">Shares</div>
-            <div className="text-base sm:text-lg text-slate-900">{shares}</div>
-          </div>
-          <div className="text-center">
-            <div className="text-xs text-slate-500 mb-1">Entry Price</div>
-            <div className="text-base sm:text-lg text-slate-900">${currentPrice}</div>
           </div>
         </div>
       </div>
