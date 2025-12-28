@@ -1,5 +1,5 @@
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
-import { TrendingUp, TrendingDown, Target, Sparkles, Info, ArrowUpRight, ArrowDownRight, Wallet, DollarSign } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, ReferenceLine } from 'recharts';
+import { TrendingUp, TrendingDown, Target, Sparkles, Info, ArrowUpRight, ArrowDownRight, Wallet, DollarSign, AlertTriangle, Shield, Zap, Flame } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
 interface HistoricalComp {
@@ -17,14 +17,23 @@ const historicalComps: HistoricalComp[] = [
   { ticker: 'FTNT', company: 'Fortinet', matchScore: 72, year: 2020, gain: '+24%', pattern: 'Cybersecurity + High Liquidity' },
 ];
 
+type RiskTolerance = 'low' | 'medium' | 'high' | 'degenerate';
+
 export function TradeImpactSimulator() {
-  const [portfolioAllocation, setPortfolioAllocation] = useState(5); // percentage
+  // Core state
+  const [convictionLevel, setConvictionLevel] = useState(5); // 1-10 scale
   const [indexBuyPressure, setIndexBuyPressure] = useState(250); // millions in AUM
   const [showHistoricalComp, setShowHistoricalComp] = useState(false);
   const [selectedComp, setSelectedComp] = useState(historicalComps[0]);
   const [tradingCapital, setTradingCapital] = useState(250000);
   const [tradingCapitalInput, setTradingCapitalInput] = useState('250000');
   const [saveAsDefault, setSaveAsDefault] = useState(false);
+  
+  // New conviction-based inputs
+  const [riskTolerance, setRiskTolerance] = useState<RiskTolerance>('medium');
+  const [targetEntryPrice, setTargetEntryPrice] = useState('342.18');
+  const [targetExitPrice, setTargetExitPrice] = useState('425.00');
+  const [showInstitutionalBenchmark, setShowInstitutionalBenchmark] = useState(false);
 
   // Load saved trading capital from localStorage on mount
   useEffect(() => {
@@ -51,11 +60,9 @@ export function TradeImpactSimulator() {
   }, [saveAsDefault, tradingCapital]);
 
   const handleTradingCapitalChange = (value: string) => {
-    // Remove non-numeric characters except for empty string
     const numericValue = value.replace(/[^0-9]/g, '');
     setTradingCapitalInput(numericValue);
     
-    // Update trading capital if it's a valid number
     const capital = Number(numericValue);
     if (capital > 0 || numericValue === '') {
       setTradingCapital(capital || 0);
@@ -68,17 +75,43 @@ export function TradeImpactSimulator() {
     return num.toLocaleString();
   };
 
+  const handlePriceInput = (value: string, setter: (val: string) => void) => {
+    // Allow numbers and one decimal point
+    const filtered = value.replace(/[^0-9.]/g, '');
+    const parts = filtered.split('.');
+    if (parts.length > 2) return; // Only one decimal point
+    setter(filtered);
+  };
+
+  // Conviction to allocation mapping (exponential curve for higher conviction = higher allocation)
+  const convictionToAllocation = (conviction: number): number => {
+    // Maps conviction 1-10 to allocation 1-20%
+    // Lower conviction = conservative, higher conviction = aggressive
+    const baseAllocation = 1;
+    const maxAllocation = 20;
+    return baseAllocation + ((conviction - 1) / 9) * (maxAllocation - baseAllocation);
+  };
+
   // Calculations
+  const portfolioAllocation = convictionToAllocation(convictionLevel);
   const portfolioValue = tradingCapital;
   const positionSize = portfolioValue * (portfolioAllocation / 100);
-  const currentPrice = 342.18;
-  const shares = Math.floor(positionSize / currentPrice);
+  const entryPrice = Number(targetEntryPrice) || 342.18;
+  const exitPrice = Number(targetExitPrice) || 425.00;
+  const shares = Math.floor(positionSize / entryPrice);
+  
+  // Calculate potential gain/loss
+  const priceChange = ((exitPrice - entryPrice) / entryPrice) * 100;
+  const potentialPL = positionSize * (priceChange / 100);
 
-  // Expected alpha based on index buy pressure and allocation
+  // Expected alpha based on conviction and index buy pressure
   const baselineReturn = 8.5; // S&P baseline
-  const buyPressureMultiplier = indexBuyPressure / 100; // Scale factor
-  const allocationBonus = portfolioAllocation * 0.4; // Higher allocation = more upside
-  const expectedAlpha = baselineReturn + buyPressureMultiplier + allocationBonus;
+  const buyPressureMultiplier = indexBuyPressure / 100;
+  const convictionBonus = convictionLevel * 0.8; // Higher conviction = more upside
+  const expectedAlpha = baselineReturn + buyPressureMultiplier + convictionBonus;
+  
+  // Institutional average (historical S&P Committee data)
+  const institutionalAverage = 12.3;
 
   const chartData = [
     {
@@ -86,62 +119,94 @@ export function TradeImpactSimulator() {
       value: baselineReturn,
       color: '#94a3b8',
     },
+    ...(showInstitutionalBenchmark ? [{
+      name: 'Institutional Avg',
+      value: institutionalAverage,
+      color: '#f59e0b',
+    }] : []),
     {
-      name: 'Expected Return',
+      name: 'Your Model',
       value: expectedAlpha,
       color: '#6366f1',
     },
   ];
 
+  // Dynamic stop-loss based on risk tolerance
+  const stopLossLevels = {
+    low: [3, 5, 7],
+    medium: [5, 10, 15],
+    high: [10, 15, 20],
+    degenerate: [15, 25, 35],
+  };
+
+  const stopLosses = stopLossLevels[riskTolerance];
+
   // P&L Scenarios
-  const scenarios = [
+  const scenarios = stopLosses.map((loss, index) => {
+    const severity = index === 0 ? 'Moderate' : index === 1 ? 'High' : 'Critical';
+    const colors = index === 0 
+      ? { color: 'text-amber-600', bgColor: 'bg-amber-50', borderColor: 'border-amber-200' }
+      : index === 1
+      ? { color: 'text-orange-600', bgColor: 'bg-orange-50', borderColor: 'border-orange-200' }
+      : { color: 'text-red-600', bgColor: 'bg-red-50', borderColor: 'border-red-200' };
+    
+    return {
+      scenario: `-${loss}% Stop Loss`,
+      price: entryPrice * (1 - loss / 100),
+      pl: positionSize * (-loss / 100),
+      plPercent: -loss,
+      trigger: `${severity} Risk`,
+      ...colors,
+    };
+  });
+
+  // Upside scenarios based on target exit
+  const upsidePercent = priceChange > 0 ? priceChange : 25;
+  const upsideScenarios = [
     {
-      scenario: '-5% Stop Loss',
-      price: currentPrice * 0.95,
-      pl: positionSize * -0.05,
-      plPercent: -5,
-      trigger: 'Moderate Risk',
-      color: 'text-amber-600',
-      bgColor: 'bg-amber-50',
-      borderColor: 'border-amber-200',
+      scenario: 'Target Exit',
+      price: exitPrice,
+      pl: potentialPL,
+      plPercent: priceChange,
     },
     {
-      scenario: '-10% Stop Loss',
-      price: currentPrice * 0.90,
-      pl: positionSize * -0.10,
-      plPercent: -10,
-      trigger: 'High Risk',
-      color: 'text-orange-600',
-      bgColor: 'bg-orange-50',
-      borderColor: 'border-orange-200',
-    },
-    {
-      scenario: '-15% Stop Loss',
-      price: currentPrice * 0.85,
-      pl: positionSize * -0.15,
-      plPercent: -15,
-      trigger: 'Critical Risk',
-      color: 'text-red-600',
-      bgColor: 'bg-red-50',
-      borderColor: 'border-red-200',
+      scenario: `+${(upsidePercent * 1.5).toFixed(0)}% Stretch`,
+      price: entryPrice * (1 + (upsidePercent * 1.5) / 100),
+      pl: positionSize * ((upsidePercent * 1.5) / 100),
+      plPercent: upsidePercent * 1.5,
     },
   ];
 
-  // Upside scenarios
-  const upsideScenarios = [
-    {
-      scenario: '+15% Target',
-      price: currentPrice * 1.15,
-      pl: positionSize * 0.15,
-      plPercent: 15,
-    },
-    {
-      scenario: '+25% Target',
-      price: currentPrice * 1.25,
-      pl: positionSize * 0.25,
-      plPercent: 25,
-    },
-  ];
+  // System guardrails & recommendations
+  const warnings = [];
+  
+  if (portfolioAllocation > 10) {
+    warnings.push({
+      type: 'allocation',
+      severity: 'warning',
+      message: 'Allocation exceeds 4-standard deviation institutional sizing',
+      detail: `Your ${portfolioAllocation.toFixed(1)}% allocation is above the 10% institutional threshold`,
+    });
+  }
+  
+  const maxStopLoss = Math.max(...stopLosses);
+  if (maxStopLoss > 15) {
+    warnings.push({
+      type: 'stop-loss',
+      severity: 'warning',
+      message: 'Statistical probability of recovery drops by 60% at this depth',
+      detail: `Wide stop-loss of -${maxStopLoss}% significantly reduces recovery probability`,
+    });
+  }
+
+  if (riskTolerance === 'degenerate' && portfolioAllocation > 12) {
+    warnings.push({
+      type: 'extreme',
+      severity: 'danger',
+      message: 'Extreme risk configuration detected',
+      detail: 'High conviction + aggressive risk tolerance may lead to significant drawdowns',
+    });
+  }
 
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
@@ -156,6 +221,13 @@ export function TradeImpactSimulator() {
     return null;
   };
 
+  const riskToleranceConfig = {
+    low: { icon: Shield, color: 'bg-blue-500', label: 'Low' },
+    medium: { icon: Target, color: 'bg-green-500', label: 'Medium' },
+    high: { icon: Zap, color: 'bg-orange-500', label: 'High' },
+    degenerate: { icon: Flame, color: 'bg-red-500', label: 'Degenerate' },
+  };
+
   return (
     <div className="space-y-6">
       {/* Simulator Header */}
@@ -166,8 +238,8 @@ export function TradeImpactSimulator() {
               <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
             <div>
-              <h3 className="text-white text-base sm:text-lg">Trade Impact Simulator</h3>
-              <p className="text-indigo-100 text-xs sm:text-sm">Model your position with precision</p>
+              <h3 className="text-white text-base sm:text-lg">Conviction Modeling Engine</h3>
+              <p className="text-indigo-100 text-xs sm:text-sm">Model your thesis with precision guardrails</p>
             </div>
           </div>
         </div>
@@ -192,7 +264,6 @@ export function TradeImpactSimulator() {
             </div>
           </div>
 
-          {/* High-contrast Input Box */}
           <div className="relative mb-4">
             <div className="absolute inset-y-0 left-0 flex items-center pl-5 pointer-events-none">
               <DollarSign className="w-6 h-6 text-slate-400" />
@@ -206,14 +277,13 @@ export function TradeImpactSimulator() {
             />
           </div>
 
-          {/* Calculated Position Badge */}
           <div className="flex items-center justify-between p-4 bg-white rounded-lg border border-indigo-200 shadow-sm">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
                 <Target className="w-4 h-4 text-green-600" />
               </div>
               <div>
-                <div className="text-xs text-slate-500">Calculated Position ({portfolioAllocation}%)</div>
+                <div className="text-xs text-slate-500">Calculated Position ({portfolioAllocation.toFixed(1)}%)</div>
                 <div className="text-lg text-slate-900">${positionSize.toLocaleString(undefined, { maximumFractionDigits: 0 })}</div>
               </div>
             </div>
@@ -223,7 +293,6 @@ export function TradeImpactSimulator() {
             </div>
           </div>
 
-          {/* Set as Default Toggle */}
           <div className="flex items-center justify-between mt-4 p-3 bg-white/60 backdrop-blur-sm rounded-lg border border-slate-200">
             <div className="flex items-center gap-2">
               <input
@@ -246,35 +315,133 @@ export function TradeImpactSimulator() {
           </div>
         </div>
 
-        {/* Portfolio Allocation Slider */}
+        {/* Conviction Level Slider */}
         <div className="mb-6">
           <div className="flex items-center justify-between mb-3">
-            <label className="text-sm text-slate-700">Portfolio Allocation</label>
+            <label className="text-sm text-slate-700 flex items-center gap-2">
+              Conviction Level
+              <div className="group relative">
+                <Info className="w-4 h-4 text-slate-400 cursor-help" />
+                <div className="hidden group-hover:block absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-56 p-2 bg-slate-900 text-white text-xs rounded-lg shadow-lg z-10">
+                  Your confidence in this trade thesis. Higher conviction = larger position size.
+                </div>
+              </div>
+            </label>
             <div className="flex items-baseline gap-2">
-              <span className="text-2xl text-slate-900">{portfolioAllocation}%</span>
-              <span className="text-xs text-slate-500">(${positionSize.toLocaleString(undefined, { maximumFractionDigits: 0 })})</span>
+              <span className="text-2xl text-slate-900">{convictionLevel}</span>
+              <span className="text-xs text-slate-500">/ 10</span>
             </div>
           </div>
           <input
             type="range"
             min="1"
-            max="15"
-            step="0.5"
-            value={portfolioAllocation}
-            onChange={(e) => setPortfolioAllocation(Number(e.target.value))}
+            max="10"
+            step="1"
+            value={convictionLevel}
+            onChange={(e) => setConvictionLevel(Number(e.target.value))}
             className="w-full h-3 bg-slate-200 rounded-lg appearance-none cursor-pointer"
             style={{
-              background: `linear-gradient(to right, rgb(99 102 241) 0%, rgb(99 102 241) ${(portfolioAllocation / 15) * 100}%, rgb(226 232 240) ${(portfolioAllocation / 15) * 100}%, rgb(226 232 240) 100%)`,
+              background: `linear-gradient(to right, rgb(99 102 241) 0%, rgb(99 102 241) ${((convictionLevel - 1) / 9) * 100}%, rgb(226 232 240) ${((convictionLevel - 1) / 9) * 100}%, rgb(226 232 240) 100%)`,
             }}
           />
           <div className="flex justify-between text-xs text-slate-400 mt-2">
-            <span>1% Conservative</span>
-            <span>15% Aggressive</span>
+            <span>1 - Low Conviction</span>
+            <span>10 - Maximum Conviction</span>
+          </div>
+          <div className="mt-3 p-3 bg-indigo-50 rounded-lg border border-indigo-200">
+            <div className="text-xs text-indigo-900">
+              <span className="font-semibold">Auto-calculated Allocation:</span> {portfolioAllocation.toFixed(1)}% 
+              ({convictionLevel <= 3 ? 'Conservative' : convictionLevel <= 6 ? 'Moderate' : convictionLevel <= 8 ? 'Aggressive' : 'Maximum'})
+            </div>
+          </div>
+        </div>
+
+        {/* Risk Tolerance Pill Toggle */}
+        <div className="mb-6">
+          <label className="text-sm text-slate-700 mb-3 block">Risk Tolerance</label>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            {(Object.keys(riskToleranceConfig) as RiskTolerance[]).map((level) => {
+              const config = riskToleranceConfig[level];
+              const Icon = config.icon;
+              const isActive = riskTolerance === level;
+              
+              return (
+                <button
+                  key={level}
+                  onClick={() => setRiskTolerance(level)}
+                  className={`p-3 rounded-lg border-2 transition-all ${
+                    isActive
+                      ? `${config.color} text-white border-transparent shadow-md`
+                      : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300'
+                  }`}
+                >
+                  <div className="flex items-center gap-2 justify-center">
+                    <Icon className="w-4 h-4" />
+                    <span className="text-sm font-medium">{config.label}</span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+          <div className="mt-3 text-xs text-slate-500">
+            Stop-loss levels: {stopLosses.map(l => `-${l}%`).join(', ')}
+          </div>
+        </div>
+
+        {/* Custom Entry/Exit Prices */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+          <div>
+            <label className="text-sm text-slate-700 mb-2 block">Target Entry Price</label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                <DollarSign className="w-4 h-4 text-slate-400" />
+              </div>
+              <input
+                type="text"
+                value={targetEntryPrice}
+                onChange={(e) => handlePriceInput(e.target.value, setTargetEntryPrice)}
+                placeholder="342.18"
+                className="w-full h-12 pl-9 pr-4 text-lg text-slate-900 bg-white border-2 border-slate-300 rounded-lg focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition-all"
+              />
+            </div>
+          </div>
+          <div>
+            <label className="text-sm text-slate-700 mb-2 block">Target Exit Price</label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                <DollarSign className="w-4 h-4 text-slate-400" />
+              </div>
+              <input
+                type="text"
+                value={targetExitPrice}
+                onChange={(e) => handlePriceInput(e.target.value, setTargetExitPrice)}
+                placeholder="425.00"
+                className="w-full h-12 pl-9 pr-4 text-lg text-slate-900 bg-white border-2 border-slate-300 rounded-lg focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition-all"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Price Change Summary */}
+        <div className="p-4 bg-gradient-to-br from-slate-50 to-purple-50 rounded-lg border border-purple-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="text-xs text-slate-600 mb-1">Expected Price Change</div>
+              <div className={`text-xl font-semibold ${priceChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                {priceChange >= 0 ? '+' : ''}{priceChange.toFixed(2)}%
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="text-xs text-slate-600 mb-1">Potential P&L</div>
+              <div className={`text-xl font-semibold ${potentialPL >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                {potentialPL >= 0 ? '+' : ''}${potentialPL.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+              </div>
+            </div>
           </div>
         </div>
 
         {/* Index Buy Pressure Slider */}
-        <div className="mb-6">
+        <div className="mt-6">
           <div className="flex items-center justify-between mb-3">
             <label className="text-sm text-slate-700 flex items-center gap-2">
               Expected Index Buy-Pressure
@@ -309,12 +476,24 @@ export function TradeImpactSimulator() {
         </div>
       </div>
 
-      {/* Expected Alpha Chart */}
+      {/* Expected Alpha Chart with Institutional Benchmark */}
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-        <h4 className="text-slate-900 mb-5 flex items-center gap-2">
-          <TrendingUp className="w-5 h-5 text-green-600" />
-          Expected Performance
-        </h4>
+        <div className="flex items-center justify-between mb-5">
+          <h4 className="text-slate-900 flex items-center gap-2">
+            <TrendingUp className="w-5 h-5 text-green-600" />
+            Expected Performance
+          </h4>
+          <button
+            onClick={() => setShowInstitutionalBenchmark(!showInstitutionalBenchmark)}
+            className={`px-3 py-1.5 text-xs rounded-lg transition-all ${
+              showInstitutionalBenchmark
+                ? 'bg-amber-100 text-amber-700 border border-amber-300'
+                : 'bg-slate-100 text-slate-600 border border-slate-200 hover:bg-slate-200'
+            }`}
+          >
+            {showInstitutionalBenchmark ? '✓ ' : ''}Institutional Benchmark
+          </button>
+        </div>
 
         <ResponsiveContainer width="100%" height={240}>
           <BarChart data={chartData}>
@@ -345,10 +524,14 @@ export function TradeImpactSimulator() {
             <ArrowUpRight className="w-5 h-5 text-green-600 mt-0.5" />
             <div>
               <div className="text-sm text-green-900 font-medium">
-                Expected Alpha: +{(expectedAlpha - baselineReturn).toFixed(1)}%
+                Model Alpha: +{(expectedAlpha - baselineReturn).toFixed(1)}%
               </div>
               <div className="text-xs text-green-700 mt-1">
-                Outperformance over S&P 500 baseline based on {indexBuyPressure}M index buy pressure
+                {showInstitutionalBenchmark && (
+                  <span>
+                    {expectedAlpha > institutionalAverage ? 'Outperforming' : 'Underperforming'} institutional avg by {Math.abs(expectedAlpha - institutionalAverage).toFixed(1)}% • 
+                  </span>
+                )} Based on conviction level {convictionLevel}/10 and ${indexBuyPressure}M buy pressure
               </div>
             </div>
           </div>
@@ -409,7 +592,7 @@ export function TradeImpactSimulator() {
                     <div className="text-lg font-semibold text-green-600">
                       +${scenario.pl.toLocaleString(undefined, { maximumFractionDigits: 0 })}
                     </div>
-                    <div className="text-xs text-green-600">+{scenario.plPercent}%</div>
+                    <div className="text-xs text-green-600">+{scenario.plPercent.toFixed(1)}%</div>
                   </div>
                 </div>
               </div>
@@ -417,6 +600,74 @@ export function TradeImpactSimulator() {
           </div>
         </div>
       </div>
+
+      {/* Dynamic System Recommendations / Guardrails */}
+      {warnings.length > 0 && (
+        <div className="space-y-3">
+          {warnings.map((warning, index) => (
+            <div
+              key={index}
+              className={`rounded-xl shadow-sm border-2 overflow-hidden ${
+                warning.severity === 'danger'
+                  ? 'border-red-300 bg-gradient-to-br from-red-50 to-orange-50'
+                  : 'border-amber-300 bg-gradient-to-br from-amber-50 to-yellow-50'
+              }`}
+            >
+              <div className="p-5">
+                <div className="flex items-start gap-4">
+                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                    warning.severity === 'danger' ? 'bg-red-100' : 'bg-amber-100'
+                  }`}>
+                    <AlertTriangle className={`w-5 h-5 ${
+                      warning.severity === 'danger' ? 'text-red-600' : 'text-amber-600'
+                    }`} />
+                  </div>
+                  <div className="flex-1">
+                    <div className={`text-sm font-semibold mb-1 ${
+                      warning.severity === 'danger' ? 'text-red-900' : 'text-amber-900'
+                    }`}>
+                      System Recommendation
+                    </div>
+                    <div className={`text-sm mb-2 ${
+                      warning.severity === 'danger' ? 'text-red-800' : 'text-amber-800'
+                    }`}>
+                      {warning.message}
+                    </div>
+                    <div className={`text-xs ${
+                      warning.severity === 'danger' ? 'text-red-700' : 'text-amber-700'
+                    }`}>
+                      {warning.detail}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {warnings.length === 0 && (
+        <div className="rounded-xl shadow-sm border-2 border-green-300 bg-gradient-to-br from-green-50 to-emerald-50 overflow-hidden">
+          <div className="p-5">
+            <div className="flex items-start gap-4">
+              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <Shield className="w-5 h-5 text-green-600" />
+              </div>
+              <div className="flex-1">
+                <div className="text-sm font-semibold text-green-900 mb-1">
+                  System Recommendation
+                </div>
+                <div className="text-sm text-green-800 mb-2">
+                  Position parameters within institutional guidelines
+                </div>
+                <div className="text-xs text-green-700">
+                  Your conviction model aligns with risk management best practices. All guardrails are green.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Historical Comparison */}
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
@@ -444,7 +695,6 @@ export function TradeImpactSimulator() {
 
         {showHistoricalComp && (
           <div className="p-5">
-            {/* Best Match Highlight */}
             <div className="mb-5 p-5 bg-gradient-to-br from-purple-100 to-indigo-100 rounded-xl border-2 border-purple-300">
               <div className="flex items-start justify-between mb-3">
                 <div>
@@ -475,7 +725,6 @@ export function TradeImpactSimulator() {
               </div>
             </div>
 
-            {/* Other Comparables */}
             <div className="space-y-3">
               <div className="text-sm text-slate-700 mb-3">Other Similar Inclusions</div>
               {historicalComps.slice(1).map((comp) => (
@@ -499,7 +748,6 @@ export function TradeImpactSimulator() {
               ))}
             </div>
 
-            {/* Pattern Insights */}
             <div className="mt-5 p-4 bg-indigo-50 rounded-lg border border-indigo-200">
               <div className="flex items-start gap-2">
                 <Info className="w-4 h-4 text-indigo-600 mt-0.5" />
