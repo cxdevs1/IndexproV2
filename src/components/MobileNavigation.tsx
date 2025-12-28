@@ -1,4 +1,4 @@
-import { BarChart3, Target, Bell } from 'lucide-react';
+import { BarChart3, Target, Sparkles } from 'lucide-react';
 
 interface MobileNavigationProps {
   activeTab: 'universe' | 'intelligence' | 'alerts';
@@ -41,11 +41,8 @@ export function MobileNavigation({ activeTab, onTabChange }: MobileNavigationPro
               : 'text-slate-500 hover:bg-slate-50'
           }`}
         >
-          <div className="relative">
-            <Bell className="w-5 h-5" />
-            <div className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full" />
-          </div>
-          <span className="text-xs">Alerts</span>
+          <Sparkles className="w-5 h-5" />
+          <span className="text-xs">Simulator</span>
         </button>
       </div>
     </div>

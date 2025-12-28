@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { UniverseMonitor } from './components/UniverseMonitor';
 import { StockIntelligence } from './components/StockIntelligence';
-import { ActionDeck } from './components/ActionDeck';
+import { TradeImpactSimulator } from './components/TradeImpactSimulator';
 import { MobileNavigation } from './components/MobileNavigation';
 import { AlertSettingsModal } from './components/AlertSettingsModal';
 import { useIsMobile } from './components/ui/use-mobile';
@@ -59,9 +59,9 @@ export default function App() {
             <StockIntelligence />
           </div>
 
-          {/* Right Column - Action Deck */}
+          {/* Right Column - Trade Impact Simulator */}
           <div className="col-span-12 lg:col-span-4">
-            <ActionDeck />
+            <TradeImpactSimulator />
           </div>
         </div>
       )}
@@ -86,7 +86,7 @@ export default function App() {
           {/* Tab 3: Alerts/Action */}
           {mobileActiveTab === 'alerts' && (
             <div className="p-4 space-y-4">
-              <ActionDeck />
+              <TradeImpactSimulator />
             </div>
           )}
 
