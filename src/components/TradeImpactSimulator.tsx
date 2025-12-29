@@ -216,7 +216,7 @@ export function TradeImpactSimulator() {
             <Sparkles className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h3 className="text-white text-xl font-semibold">Trade Impact Simulator</h3>
+            <h3 className="text-white text-xl font-semibold">Scenario Lab</h3>
             <p className="text-indigo-100 text-sm">Conviction-based modeling with institutional guardrails</p>
           </div>
         </div>

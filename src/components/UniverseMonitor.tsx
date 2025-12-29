@@ -208,20 +208,20 @@ export function UniverseMonitor() {
         </div>
       )}
 
-      {/* Universe Monitor */}
+      {/* The Board */}
       <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
         {/* Unified Header - Brand Identity */}
-        <div className="bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900 p-5 relative overflow-hidden">
+        <div className="bg-gradient-to-br from-indigo-600 via-purple-600 to-purple-700 p-4 sm:p-5 relative overflow-hidden">
           {/* Decorative gradient orbs */}
-          <div className="absolute top-0 right-0 w-48 h-48 bg-indigo-500/20 rounded-full blur-3xl"></div>
-          <div className="absolute -bottom-6 -left-6 w-32 h-32 bg-blue-400/20 rounded-full blur-2xl"></div>
+          <div className="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full blur-3xl"></div>
+          <div className="absolute -bottom-8 -left-8 w-32 h-32 bg-indigo-400/20 rounded-full blur-2xl"></div>
           
           <div className="relative z-10 flex items-center gap-3">
-            <div className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center border border-white/30 shadow-lg">
-              <Target className="w-5 h-5 text-white" />
+            <div className="w-10 h-10 sm:w-11 sm:h-11 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center border border-white/30 shadow-lg">
+              <BarChart3 className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
             </div>
             <div>
-              <h2 className="text-white font-semibold">Universe Monitor</h2>
+              <h2 className="text-white font-semibold">The Board</h2>
               <p className="text-slate-300 text-xs">Live S&P Index Rankings</p>
             </div>
           </div>
