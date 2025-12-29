@@ -23,12 +23,13 @@ export function PropulsionGauge({
 
   // Determine intensity level - Opportunity-based (not risk-based!)
   const getIntensityConfig = (score: number) => {
-    if (score > 75) {
+    if (score >= 75) {
       return {
         label: 'Ignition State',
-        color: '#fbbf24', // vibrant gold
-        glowColor: 'rgba(251, 191, 36, 0.4)',
-        bgGradient: 'from-yellow-50 via-amber-50 to-purple-50',
+        color: '#A855F7', // electric purple
+        secondaryColor: '#EAB308', // vibrant gold
+        glowColor: 'rgba(168, 85, 247, 0.4)',
+        bgGradient: 'from-purple-50 via-fuchsia-50 to-yellow-50',
         description: 'Exceptional launch potential—maximum upward pressure expected',
         icon: Rocket,
       };
@@ -113,7 +114,14 @@ export function PropulsionGauge({
         <div className={`px-4 py-2 bg-gradient-to-br ${intensityConfig.bgGradient} rounded-xl border-2`}
           style={{ borderColor: intensityConfig.color }}>
           <div className="text-center">
-            <div className="text-2xl font-bold" style={{ color: intensityConfig.color }}>
+            <div className="text-2xl font-bold" style={{ 
+              color: intensityConfig.color,
+              background: intensityConfig.secondaryColor && propulsionScore >= 75
+                ? `linear-gradient(135deg, ${intensityConfig.color}, ${intensityConfig.secondaryColor})`
+                : undefined,
+              WebkitBackgroundClip: intensityConfig.secondaryColor && propulsionScore >= 75 ? 'text' : undefined,
+              WebkitTextFillColor: intensityConfig.secondaryColor && propulsionScore >= 75 ? 'transparent' : undefined,
+            }}>
               {propulsionScore}
             </div>
             <div className="text-[10px] font-semibold text-slate-600 uppercase tracking-wide">

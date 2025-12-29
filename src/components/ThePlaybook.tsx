@@ -162,7 +162,7 @@ export function ThePlaybook() {
                                 {phase.id === 'vetting' && (
                                   <MentorshipTooltip 
                                     term="Vetting"
-                                    definition="The system is interviewing the stock to ensure it's not a 'one-hit wonder.' This is your prime accumulation window—lowest prices before the market catches on."
+                                    definition="The system is interviewing the stock to ensure its profitability and liquidity are institutional-grade."
                                     position="bottom"
                                   />
                                 )}
@@ -176,7 +176,7 @@ export function ThePlaybook() {
                                 {phase.id === 'harvesting' && (
                                   <MentorshipTooltip 
                                     term="Harvesting"
-                                    definition="The professional way to say 'taking profits' before the market reverses. We sell 75% at the announcement headline (peak hype), then exit the rest before buying pressure fades."
+                                    definition="The professional strategy of exiting a position before the 'Inclusion Pop' reverses."
                                     position="bottom"
                                   />
                                 )}

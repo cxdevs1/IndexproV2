@@ -21,6 +21,7 @@ const historicalComps: HistoricalComp[] = [
 ];
 
 type RiskTolerance = 'defensive' | 'balanced' | 'aggressive' | 'speculative';
+type MarketCondition = 'bullish' | 'sideways' | 'stress';
 
 export function TradeImpactSimulator() {
   // Core state
@@ -36,6 +37,7 @@ export function TradeImpactSimulator() {
   const [targetEntryPrice, setTargetEntryPrice] = useState('342.18');
   const [targetExitPrice, setTargetExitPrice] = useState('425.00');
   const [showInstitutionalBenchmark, setShowInstitutionalBenchmark] = useState(false);
+  const [marketCondition, setMarketCondition] = useState<MarketCondition>('bullish');
 
   // Load saved active bankroll
   useEffect(() => {
@@ -300,6 +302,79 @@ export function TradeImpactSimulator() {
                   Saved
                 </div>
               )}
+            </div>
+          </div>
+
+          {/* Market Condition Toggle - NEW */}
+          <div className="mb-6 p-5 bg-gradient-to-br from-slate-50 to-indigo-50 rounded-xl border-2 border-slate-200 shadow-sm">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-8 h-8 bg-slate-700 rounded-lg flex items-center justify-center">
+                <Activity className="w-4 h-4 text-white" />
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center gap-1">
+                  <label className="text-sm font-medium text-slate-900">Market Condition</label>
+                  <MentorshipTooltip 
+                    term="Market Stress Test"
+                    definition="Institutional desks never model in a vacuum. This shows if your inclusion trade can survive a broader market slide."
+                    position="right"
+                  />
+                </div>
+                <div className="text-xs text-slate-600">Adjust alpha expectations for market headwinds</div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2">
+              <button
+                onClick={() => setMarketCondition('bullish')}
+                className={`p-3 rounded-xl border-2 transition-all ${
+                  marketCondition === 'bullish'
+                    ? 'bg-gradient-to-br from-green-500 to-emerald-600 border-green-400 text-white shadow-md'
+                    : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300'
+                }`}
+              >
+                <div className="flex items-center justify-center gap-1.5 mb-1">
+                  <TrendingUp className="w-4 h-4" />
+                  <span className="text-xs font-semibold">Bullish</span>
+                </div>
+                <div className={`text-[10px] ${marketCondition === 'bullish' ? 'text-green-100' : 'text-slate-500'}`}>
+                  Standard
+                </div>
+              </button>
+
+              <button
+                onClick={() => setMarketCondition('sideways')}
+                className={`p-3 rounded-xl border-2 transition-all ${
+                  marketCondition === 'sideways'
+                    ? 'bg-gradient-to-br from-blue-500 to-indigo-600 border-blue-400 text-white shadow-md'
+                    : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300'
+                }`}
+              >
+                <div className="flex items-center justify-center gap-1.5 mb-1">
+                  <Activity className="w-4 h-4" />
+                  <span className="text-xs font-semibold">Sideways</span>
+                </div>
+                <div className={`text-[10px] ${marketCondition === 'sideways' ? 'text-blue-100' : 'text-slate-500'}`}>
+                  -10% Alpha
+                </div>
+              </button>
+
+              <button
+                onClick={() => setMarketCondition('stress')}
+                className={`p-3 rounded-xl border-2 transition-all ${
+                  marketCondition === 'stress'
+                    ? 'bg-gradient-to-br from-amber-500 to-orange-600 border-amber-400 text-white shadow-md'
+                    : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300'
+                }`}
+              >
+                <div className="flex items-center justify-center gap-1.5 mb-1">
+                  <AlertTriangle className="w-4 h-4" />
+                  <span className="text-xs font-semibold">Stress Test</span>
+                </div>
+                <div className={`text-[10px] ${marketCondition === 'stress' ? 'text-amber-100' : 'text-slate-500'}`}>
+                  -20% Beta Drag
+                </div>
+              </button>
             </div>
           </div>
 
