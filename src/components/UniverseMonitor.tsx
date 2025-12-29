@@ -13,21 +13,22 @@ interface Stock {
   marketCap: string;
   avgVolume: string;
   price: string;
+  exitFriction?: number; // 0-100, short interest intensity
 }
 
 const mockStocks: Stock[] = [
-  { ticker: 'AXON', company: 'Axon Enterprise', score: 94, change: 3.2, index: 'S&P 600', marketCap: '$8.2B', avgVolume: '42M', price: '$342.18' },
-  { ticker: 'CROX', company: 'Crocs Inc.', score: 91, change: 2.1, index: 'S&P 600', marketCap: '$6.8B', avgVolume: '38M', price: '$128.45' },
-  { ticker: 'CHWY', company: 'Chewy Inc.', score: 88, change: 1.8, index: 'S&P 400', marketCap: '$12.4B', avgVolume: '52M', price: '$45.67' },
-  { ticker: 'ENPH', company: 'Enphase Energy', score: 86, change: -0.5, index: 'S&P 400', marketCap: '$15.2B', avgVolume: '65M', price: '$112.34' },
-  { ticker: 'HALO', company: 'Halozyme Therapeutics', score: 84, change: 1.2, index: 'S&P 600', marketCap: '$7.1B', avgVolume: '28M', price: '$58.92' },
-  { ticker: 'TECH', company: 'Bio-Techne Corp', score: 82, change: 0.9, index: 'S&P 400', marketCap: '$9.6B', avgVolume: '31M', price: '$78.23' },
-  { ticker: 'GLOB', company: 'Globant SA', score: 79, change: -1.1, index: 'S&P 600', marketCap: '$8.9B', avgVolume: '44M', price: '$234.56' },
-  { ticker: 'AVNT', company: 'Avient Corp', score: 76, change: 0.4, index: 'S&P 400', marketCap: '$11.3B', avgVolume: '48M', price: '$52.18' },
-  { ticker: 'NTRA', company: 'Natera Inc.', score: 73, change: 2.5, index: 'S&P 600', marketCap: '$6.4B', avgVolume: '35M', price: '$67.89' },
-  { ticker: 'FTNT', company: 'Fortinet Inc.', score: 71, change: 1.6, index: 'S&P 500', marketCap: '$45.2B', avgVolume: '125M', price: '$189.45' },
-  { ticker: 'PRVA', company: 'Privia Health', score: 68, change: -0.8, index: 'S&P 600', marketCap: '$5.8B', avgVolume: '22M', price: '$42.31' },
-  { ticker: 'ZS', company: 'Zscaler Inc.', score: 65, change: 0.3, index: 'S&P 500', marketCap: '$38.7B', avgVolume: '98M', price: '$256.78' },
+  { ticker: 'AXON', company: 'Axon Enterprise', score: 94, change: 3.2, index: 'S&P 600', marketCap: '$8.2B', avgVolume: '42M', price: '$342.18', exitFriction: 78 },
+  { ticker: 'CROX', company: 'Crocs Inc.', score: 91, change: 2.1, index: 'S&P 600', marketCap: '$6.8B', avgVolume: '38M', price: '$128.45', exitFriction: 65 },
+  { ticker: 'CHWY', company: 'Chewy Inc.', score: 88, change: 1.8, index: 'S&P 400', marketCap: '$12.4B', avgVolume: '52M', price: '$45.67', exitFriction: 72 },
+  { ticker: 'ENPH', company: 'Enphase Energy', score: 86, change: -0.5, index: 'S&P 400', marketCap: '$15.2B', avgVolume: '65M', price: '$112.34', exitFriction: 54 },
+  { ticker: 'HALO', company: 'Halozyme Therapeutics', score: 84, change: 1.2, index: 'S&P 600', marketCap: '$7.1B', avgVolume: '28M', price: '$58.92', exitFriction: 61 },
+  { ticker: 'TECH', company: 'Bio-Techne Corp', score: 82, change: 0.9, index: 'S&P 400', marketCap: '$9.6B', avgVolume: '31M', price: '$78.23', exitFriction: 48 },
+  { ticker: 'GLOB', company: 'Globant SA', score: 79, change: -1.1, index: 'S&P 600', marketCap: '$8.9B', avgVolume: '44M', price: '$234.56', exitFriction: 42 },
+  { ticker: 'AVNT', company: 'Avient Corp', score: 76, change: 0.4, index: 'S&P 400', marketCap: '$11.3B', avgVolume: '48M', price: '$52.18', exitFriction: 38 },
+  { ticker: 'NTRA', company: 'Natera Inc.', score: 73, change: 2.5, index: 'S&P 600', marketCap: '$6.4B', avgVolume: '35M', price: '$67.89', exitFriction: 55 },
+  { ticker: 'FTNT', company: 'Fortinet Inc.', score: 71, change: 1.6, index: 'S&P 500', marketCap: '$45.2B', avgVolume: '125M', price: '$189.45', exitFriction: 31 },
+  { ticker: 'PRVA', company: 'Privia Health', score: 68, change: -0.8, index: 'S&P 600', marketCap: '$5.8B', avgVolume: '22M', price: '$42.31', exitFriction: 28 },
+  { ticker: 'ZS', company: 'Zscaler Inc.', score: 65, change: 0.3, index: 'S&P 500', marketCap: '$38.7B', avgVolume: '98M', price: '$256.78', exitFriction: 24 },
 ];
 
 type IndexFilter = 'All' | 'S&P 600' | 'S&P 400' | 'S&P 500';
@@ -478,35 +479,20 @@ export function UniverseMonitor() {
                   </div>
                 </div>
 
-                {/* Score Progress */}
-                <div className="p-4 bg-slate-50 rounded-xl border border-slate-200">
-                  <div className="text-xs text-slate-600 font-medium mb-3">Inclusion Score Progress</div>
-                  <div className="w-full h-3 bg-white rounded-full overflow-hidden border border-slate-200">
-                    <div
-                      className={`h-full rounded-full transition-all ${
-                        selectedStock.score >= 85
-                          ? 'bg-gradient-to-r from-green-500 to-green-600'
-                          : selectedStock.score >= 70
-                          ? 'bg-gradient-to-r from-blue-500 to-blue-600'
-                          : 'bg-gradient-to-r from-slate-400 to-slate-500'
-                      }`}
-                      style={{ width: `${selectedStock.score}%` }}
-                    />
-                  </div>
-                  <div className="flex justify-between text-xs text-slate-500 mt-2">
-                    <span>0</span>
-                    <span className="font-semibold">{selectedStock.score}/100</span>
-                  </div>
-                </div>
-
-                {/* Status Badge */}
-                {selectedStock.score >= 85 && (
-                  <div className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border-2 border-green-200">
-                    <div className="flex items-center gap-2">
-                      <Sparkles className="w-4 h-4 text-green-600" />
-                      <span className="text-sm font-semibold text-green-900">High-Alpha Target</span>
+                {/* Exit Friction - Key Metric */}
+                {selectedStock.exitFriction && (
+                  <div className="p-4 bg-gradient-to-br from-pink-50 to-rose-50 rounded-xl border-2 border-pink-200">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="text-xs text-pink-700 font-medium">Exit Friction</div>
+                      <div className="text-2xl font-bold text-pink-900">{selectedStock.exitFriction}%</div>
                     </div>
-                    <p className="text-xs text-green-700 mt-1">Strong inclusion candidate</p>
+                    <div className="w-full h-2 bg-white rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-r from-pink-500 to-rose-500 rounded-full transition-all"
+                        style={{ width: `${selectedStock.exitFriction}%` }}
+                      />
+                    </div>
+                    <p className="text-xs text-pink-700 mt-2">Short seller buy-back pressure intensity</p>
                   </div>
                 )}
               </div>

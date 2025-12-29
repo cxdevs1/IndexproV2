@@ -81,10 +81,9 @@ export default function App() {
             <UniverseMonitor />
           </div>
 
-          {/* Center Column - Core Analysis & The Playbook */}
-          <div className="col-span-12 lg:col-span-5 space-y-4" data-tour="intelligence">
+          {/* Center Column - Core Analysis */}
+          <div className="col-span-12 lg:col-span-5" data-tour="intelligence">
             <StockIntelligence />
-            <ThePlaybook />
           </div>
 
           {/* Right Column - Scenario Lab */}
