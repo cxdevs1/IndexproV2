@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { UniverseMonitor } from './components/TheBoard';
 import { StockIntelligence } from './components/StockIntelligence';
 import { TradeImpactSimulator } from './components/ScenarioLab';
+import { ThePlaybook } from './components/ThePlaybook';
 import { MobileNavigation } from './components/MobileNavigation';
 import { AlertSettingsModal } from './components/AlertSettingsModal';
 import { MobileOnboarding } from './components/MobileOnboarding';
@@ -10,7 +11,7 @@ import { Bell, BookOpen } from 'lucide-react';
 
 export default function App() {
   const isMobile = useIsMobile();
-  const [mobileActiveTab, setMobileActiveTab] = useState<'board' | 'intelligence' | 'scenario'>('board');
+  const [mobileActiveTab, setMobileActiveTab] = useState<'board' | 'intelligence' | 'playbook' | 'scenario'>('board');
   const [showAlertSettings, setShowAlertSettings] = useState(false);
   const [showMobileOnboarding, setShowMobileOnboarding] = useState(false);
 
@@ -80,9 +81,10 @@ export default function App() {
             <UniverseMonitor />
           </div>
 
-          {/* Center Column - Core Analysis */}
-          <div className="col-span-12 lg:col-span-5" data-tour="intelligence">
+          {/* Center Column - Core Analysis & The Playbook */}
+          <div className="col-span-12 lg:col-span-5 space-y-4" data-tour="intelligence">
             <StockIntelligence />
+            <ThePlaybook />
           </div>
 
           {/* Right Column - Scenario Lab */}
@@ -109,7 +111,14 @@ export default function App() {
             </div>
           )}
 
-          {/* Tab 3: Scenario Lab */}
+          {/* Tab 3: The Playbook */}
+          {mobileActiveTab === 'playbook' && (
+            <div className="p-4">
+              <ThePlaybook />
+            </div>
+          )}
+
+          {/* Tab 4: Scenario Lab */}
           {mobileActiveTab === 'scenario' && (
             <div className="p-4 space-y-4">
               <TradeImpactSimulator />

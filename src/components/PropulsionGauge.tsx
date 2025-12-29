@@ -1,4 +1,4 @@
-import { Activity, TrendingUp, Zap, AlertTriangle } from 'lucide-react';
+import { Activity, TrendingUp, Zap, Rocket, Flame } from 'lucide-react';
 import { useState } from 'react';
 import { MentorshipTooltip } from './MentorshipTooltip';
 
@@ -21,33 +21,33 @@ export function PropulsionGauge({
   // Weighted: 60% institutional gravity + 40% exit friction
   const propulsionScore = Math.round(institutionalGravity * 0.6 + exitFriction * 0.4);
 
-  // Determine intensity level
+  // Determine intensity level - Opportunity-based (not risk-based!)
   const getIntensityConfig = (score: number) => {
-    if (score >= 75) {
+    if (score >= 80) {
       return {
-        label: 'Extreme Propulsion',
-        color: '#ef4444',
-        glowColor: 'rgba(239, 68, 68, 0.3)',
-        bgGradient: 'from-red-50 to-pink-50',
-        description: 'Very high probability of significant price movement',
-        icon: Zap,
+        label: 'Ignition',
+        color: '#fbbf24', // vibrant gold
+        glowColor: 'rgba(251, 191, 36, 0.4)',
+        bgGradient: 'from-yellow-50 via-amber-50 to-purple-50',
+        description: 'Exceptional launch potential—maximum upward pressure expected',
+        icon: Rocket,
       };
     } else if (score >= 50) {
       return {
-        label: 'Moderate Propulsion',
-        color: '#f59e0b',
-        glowColor: 'rgba(245, 158, 11, 0.3)',
-        bgGradient: 'from-amber-50 to-orange-50',
-        description: 'Elevated buying pressure expected',
-        icon: AlertTriangle,
+        label: 'Charging',
+        color: '#6366f1', // indigo
+        glowColor: 'rgba(99, 102, 241, 0.3)',
+        bgGradient: 'from-indigo-50 to-purple-50',
+        description: 'Building momentum—elevated buying pressure forming',
+        icon: Flame,
       };
     } else {
       return {
-        label: 'Normal Flow',
-        color: '#10b981',
-        glowColor: 'rgba(16, 185, 129, 0.3)',
-        bgGradient: 'from-green-50 to-emerald-50',
-        description: 'Standard market dynamics',
+        label: 'Idle',
+        color: '#64748b', // slate
+        glowColor: 'rgba(100, 116, 139, 0.2)',
+        bgGradient: 'from-slate-50 to-slate-100',
+        description: 'Standard market dynamics—baseline opportunity',
         icon: Activity,
       };
     }
@@ -322,7 +322,7 @@ export function PropulsionGauge({
         </div>
       </div>
 
-      {/* Intensity Analysis Card */}
+      {/* Launch Potential Analysis Card */}
       <div className={`relative bg-gradient-to-br ${intensityConfig.bgGradient} rounded-2xl p-5 border-2 overflow-hidden shadow-sm`}
         style={{ borderColor: intensityConfig.color }}>
         <div className="absolute inset-0 opacity-20">
@@ -337,7 +337,7 @@ export function PropulsionGauge({
               <IntensityIcon className="w-5 h-5 text-white" />
             </div>
             <div className="flex-1">
-              <h5 className="font-semibold text-slate-900">{intensityConfig.label}</h5>
+              <h5 className="font-semibold text-slate-900">Launch Potential: {intensityConfig.label}</h5>
               <p className="text-xs text-slate-600">{intensityConfig.description}</p>
             </div>
             <div className="text-right">

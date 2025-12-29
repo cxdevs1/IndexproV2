@@ -1,14 +1,14 @@
-import { BarChart3, Target, Sparkles } from 'lucide-react';
+import { BarChart3, Target, Sparkles, Map } from 'lucide-react';
 
 interface MobileNavigationProps {
-  activeTab: 'board' | 'intelligence' | 'scenario';
-  onTabChange: (tab: 'board' | 'intelligence' | 'scenario') => void;
+  activeTab: 'board' | 'intelligence' | 'playbook' | 'scenario';
+  onTabChange: (tab: 'board' | 'intelligence' | 'playbook' | 'scenario') => void;
 }
 
 export function MobileNavigation({ activeTab, onTabChange }: MobileNavigationProps) {
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-xl border-t border-slate-200/50 shadow-lg z-50">
-      <div className="grid grid-cols-3 h-16">
+      <div className="grid grid-cols-4 h-16">
         <button
           onClick={() => onTabChange('board')}
           className={`relative flex flex-col items-center justify-center gap-1 min-h-[44px] transition-all ${
@@ -37,6 +37,21 @@ export function MobileNavigation({ activeTab, onTabChange }: MobileNavigationPro
           )}
           <Target className="w-5 h-5" />
           <span className="text-[10px] font-medium">Core Analysis</span>
+        </button>
+
+        <button
+          onClick={() => onTabChange('playbook')}
+          className={`relative flex flex-col items-center justify-center gap-1 min-h-[44px] transition-all ${
+            activeTab === 'playbook'
+              ? 'text-indigo-600'
+              : 'text-slate-500 active:bg-slate-50'
+          }`}
+        >
+          {activeTab === 'playbook' && (
+            <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-b-full"></div>
+          )}
+          <Map className="w-5 h-5" />
+          <span className="text-[10px] font-medium">Playbook</span>
         </button>
 
         <button
