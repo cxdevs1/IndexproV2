@@ -16,7 +16,7 @@ export function AlertSettingsModal({ isOpen, onClose }: AlertSettingsModalProps)
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
       <div className="bg-white rounded-xl shadow-2xl border border-slate-200 max-w-md w-full max-h-[90vh] overflow-hidden">
         {/* Header */}
         <div className="p-5 border-b border-slate-200 bg-gradient-to-br from-slate-50 to-white">

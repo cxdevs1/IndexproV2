@@ -15,7 +15,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       {/* Header */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-10 shadow-sm">
+      <header className="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
         <div className="px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 sm:gap-3">
