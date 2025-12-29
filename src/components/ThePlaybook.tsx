@@ -41,7 +41,7 @@ const phases: Phase[] = [
     status: 'active',
     tacticalAdvice: 'Optimal entry window. Institutional tracking active. Continue position building.',
     strategy: 'Score stability confirms thesis. Continue accumulation if conviction remains high. Watch for Committee signals.',
-    whyThisMatters: 'Score persistence above 70 means institutional algorithms are flagging this stock. They\'ll have to buy when it\'s officially added.',
+    whyThisMatters: 'Score persistence above 70 means institutional algorithms are tracking this stock. They\'ll have to buy shares when it\'s officially added, creating upward price pressure.',
     actionLabel: 'ACTION: BUY',
     actionColor: '#10b981',
     icon: TrendingUp,
@@ -162,14 +162,21 @@ export function ThePlaybook() {
                                 {phase.id === 'vetting' && (
                                   <MentorshipTooltip 
                                     term="Vetting"
-                                    definition="The Vetting phase is when the S&P Committee evaluates whether a stock meets inclusion criteria. This is your prime accumulation window—lowest prices before the market catches on."
+                                    definition="The system is interviewing the stock to ensure it's not a 'one-hit wonder.' This is your prime accumulation window—lowest prices before the market catches on."
+                                    position="bottom"
+                                  />
+                                )}
+                                {phase.id === 'high-confidence' && (
+                                  <MentorshipTooltip 
+                                    term="High Confidence"
+                                    definition="Score persistence above 70 means institutional algorithms are tracking this stock. They'll have to buy shares when it's officially added, creating upward price pressure."
                                     position="bottom"
                                   />
                                 )}
                                 {phase.id === 'harvesting' && (
                                   <MentorshipTooltip 
                                     term="Harvesting"
-                                    definition="Harvesting means taking profits at the optimal time. We sell 75% when the headline hits (peak hype), then exit the rest after institutions finish buying. This locks in gains before the crowd realizes the party is over."
+                                    definition="The professional way to say 'taking profits' before the market reverses. We sell 75% at the announcement headline (peak hype), then exit the rest before buying pressure fades."
                                     position="bottom"
                                   />
                                 )}

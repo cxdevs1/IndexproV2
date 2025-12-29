@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { UniverseMonitor } from './components/TheBoard';
+import { TheBoard } from './components/TheBoard';
 import { StockIntelligence } from './components/StockIntelligence';
 import { TradeImpactSimulator } from './components/ScenarioLab';
 import { ThePlaybook } from './components/ThePlaybook';
@@ -78,7 +78,7 @@ export default function App() {
         <div className="grid grid-cols-12 gap-6 p-6 max-w-[1800px] mx-auto">
           {/* Left Column - The Board */}
           <div className="col-span-12 lg:col-span-3" data-tour="board">
-            <UniverseMonitor />
+            <TheBoard />
           </div>
 
           {/* Center Column - Core Analysis */}
@@ -99,7 +99,7 @@ export default function App() {
           {/* Tab 1: The Board */}
           {mobileActiveTab === 'board' && (
             <div className="p-4">
-              <UniverseMonitor />
+              <TheBoard />
             </div>
           )}
 

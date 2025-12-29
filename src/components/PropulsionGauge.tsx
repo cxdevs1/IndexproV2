@@ -23,9 +23,9 @@ export function PropulsionGauge({
 
   // Determine intensity level - Opportunity-based (not risk-based!)
   const getIntensityConfig = (score: number) => {
-    if (score >= 80) {
+    if (score > 75) {
       return {
-        label: 'Ignition',
+        label: 'Ignition State',
         color: '#fbbf24', // vibrant gold
         glowColor: 'rgba(251, 191, 36, 0.4)',
         bgGradient: 'from-yellow-50 via-amber-50 to-purple-50',
