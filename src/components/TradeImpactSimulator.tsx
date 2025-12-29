@@ -2,6 +2,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { TrendingUp, TrendingDown, Target, Sparkles, Info, ArrowUpRight, ArrowDownRight, Wallet, DollarSign, AlertTriangle, Shield, Zap, Flame, Activity, Award } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useIsMobile } from './ui/use-mobile';
+import { ForceMultiplierGauge } from './ForceMultiplierGauge';
 
 interface HistoricalComp {
   ticker: string;
@@ -23,7 +24,8 @@ type RiskTolerance = 'low' | 'medium' | 'high' | 'degenerate';
 export function TradeImpactSimulator() {
   // Core state
   const [convictionLevel, setConvictionLevel] = useState(5);
-  const [indexBuyPressure, setIndexBuyPressure] = useState(250);
+  const [passiveFlowImpact, setPassiveFlowImpact] = useState(65); // 0-100 from AUM calculation
+  const [shortSqueezePotential, setShortSqueezePotential] = useState(45); // 0-100 from Short Interest % + Days to Cover
   const [showHistoricalComp, setShowHistoricalComp] = useState(false);
   const [selectedComp, setSelectedComp] = useState(historicalComps[0]);
   const [tradingCapital, setTradingCapital] = useState(250000);
@@ -96,7 +98,9 @@ export function TradeImpactSimulator() {
 
   // Expected alpha
   const baselineReturn = 8.5;
-  const buyPressureMultiplier = indexBuyPressure / 100;
+  // Calculate squeeze score from passive flow and short squeeze
+  const squeezeScore = Math.round(passiveFlowImpact * 0.6 + shortSqueezePotential * 0.4);
+  const buyPressureMultiplier = squeezeScore / 20; // Scale squeeze score to reasonable multiplier
   const convictionBonus = convictionLevel * 0.8;
   const expectedAlpha = baselineReturn + buyPressureMultiplier + convictionBonus;
   const institutionalAverage = 12.3;
@@ -359,8 +363,8 @@ export function TradeImpactSimulator() {
             </div>
           </div>
 
-          {/* Entry/Exit Prices + Buy Pressure */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Entry/Exit Prices */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <div className="p-4 bg-white rounded-xl border border-slate-200 shadow-sm">
               <label className="text-xs font-medium text-slate-700 mb-2 block">Entry Price</label>
               <div className="relative">
@@ -389,30 +393,16 @@ export function TradeImpactSimulator() {
                 />
               </div>
             </div>
-            <div className="p-4 bg-white rounded-xl border border-slate-200 shadow-sm">
-              <label className="text-xs font-medium text-slate-700 mb-2 block flex items-center gap-1">
-                Index Buy Pressure
-                <div className="group relative">
-                  <Info className="w-3 h-3 text-slate-400 cursor-help" />
-                  <div className="hidden group-hover:block absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-40 p-2 bg-slate-900 text-white text-xs rounded-lg shadow-lg z-10">
-                    Passive fund inflows
-                  </div>
-                </div>
-              </label>
-              <div className="text-lg font-bold text-purple-600 mb-1">${indexBuyPressure}M</div>
-              <input
-                type="range"
-                min="50"
-                max="500"
-                step="10"
-                value={indexBuyPressure}
-                onChange={(e) => setIndexBuyPressure(Number(e.target.value))}
-                className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer"
-                style={{
-                  background: `linear-gradient(to right, rgb(139 92 246) 0%, rgb(139 92 246) ${((indexBuyPressure - 50) / 450) * 100}%, rgb(226 232 240) ${((indexBuyPressure - 50) / 450) * 100}%, rgb(226 232 240) 100%)`,
-                }}
-              />
-            </div>
+          </div>
+
+          {/* Force Multiplier Advisor */}
+          <div className="p-5 bg-white rounded-xl border border-slate-200 shadow-sm overflow-visible">
+            <ForceMultiplierGauge
+              passiveFlowImpact={passiveFlowImpact}
+              shortSqueezePotential={shortSqueezePotential}
+              onPassiveFlowChange={setPassiveFlowImpact}
+              onShortSqueezeChange={setShortSqueezePotential}
+            />
           </div>
         </div>
 
