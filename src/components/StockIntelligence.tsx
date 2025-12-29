@@ -1,7 +1,8 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
-import { CheckCircle2, XCircle, AlertCircle, TrendingUp, ShieldAlert, ShieldCheck, Info, CircleDot, Circle, DollarSign, BarChart3, Droplets, Building2, Wallet, Activity } from 'lucide-react';
+import { CheckCircle2, XCircle, AlertCircle, TrendingUp, ShieldAlert, ShieldCheck, Info, CircleDot, Circle, DollarSign, BarChart3, Droplets, Building2, Wallet, Activity, Zap, Target as TargetIcon } from 'lucide-react';
 import { useState } from 'react';
 import { useIsMobile } from './ui/use-mobile';
+import { ThePlaybook } from './ThePlaybook';
 
 const scoreData = [
   { date: 'Jan 15', score: 72 },

@@ -2,7 +2,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { TrendingUp, TrendingDown, Target, Sparkles, Info, ArrowUpRight, ArrowDownRight, Wallet, DollarSign, AlertTriangle, Shield, Zap, Flame, Activity, Award } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useIsMobile } from './ui/use-mobile';
-import { ForceMultiplierGauge } from './ForceMultiplierGauge';
+import { PropulsionGauge } from './PropulsionGauge';
 
 interface HistoricalComp {
   ticker: string;
@@ -19,52 +19,52 @@ const historicalComps: HistoricalComp[] = [
   { ticker: 'FTNT', company: 'Fortinet', matchScore: 72, year: 2020, gain: '+24%', pattern: 'Cybersecurity + High Liquidity' },
 ];
 
-type RiskTolerance = 'low' | 'medium' | 'high' | 'degenerate';
+type RiskTolerance = 'defensive' | 'balanced' | 'aggressive' | 'speculative';
 
 export function TradeImpactSimulator() {
   // Core state
   const [convictionLevel, setConvictionLevel] = useState(5);
-  const [passiveFlowImpact, setPassiveFlowImpact] = useState(65); // 0-100 from AUM calculation
-  const [shortSqueezePotential, setShortSqueezePotential] = useState(45); // 0-100 from Short Interest % + Days to Cover
+  const [institutionalGravity, setInstitutionalGravity] = useState(65); // 0-100 from AUM calculation
+  const [exitFriction, setExitFriction] = useState(45); // 0-100 from Short Interest % + Days to Cover
   const [showHistoricalComp, setShowHistoricalComp] = useState(false);
   const [selectedComp, setSelectedComp] = useState(historicalComps[0]);
-  const [tradingCapital, setTradingCapital] = useState(250000);
-  const [tradingCapitalInput, setTradingCapitalInput] = useState('250000');
+  const [activeBankroll, setActiveBankroll] = useState(250000);
+  const [activeBankrollInput, setActiveBankrollInput] = useState('250000');
   const [saveAsDefault, setSaveAsDefault] = useState(false);
-  const [riskTolerance, setRiskTolerance] = useState<RiskTolerance>('medium');
+  const [riskTolerance, setRiskTolerance] = useState<RiskTolerance>('balanced');
   const [targetEntryPrice, setTargetEntryPrice] = useState('342.18');
   const [targetExitPrice, setTargetExitPrice] = useState('425.00');
   const [showInstitutionalBenchmark, setShowInstitutionalBenchmark] = useState(false);
 
-  // Load saved trading capital
+  // Load saved active bankroll
   useEffect(() => {
-    const savedCapital = localStorage.getItem('indexPro_tradingCapital');
+    const savedCapital = localStorage.getItem('indexPro_activeBankroll');
     const savedDefault = localStorage.getItem('indexPro_saveAsDefault');
     
     if (savedCapital && savedDefault === 'true') {
       const capital = Number(savedCapital);
-      setTradingCapital(capital);
-      setTradingCapitalInput(capital.toString());
+      setActiveBankroll(capital);
+      setActiveBankrollInput(capital.toString());
       setSaveAsDefault(true);
     }
   }, []);
 
   useEffect(() => {
     if (saveAsDefault) {
-      localStorage.setItem('indexPro_tradingCapital', tradingCapital.toString());
+      localStorage.setItem('indexPro_activeBankroll', activeBankroll.toString());
       localStorage.setItem('indexPro_saveAsDefault', 'true');
     } else {
-      localStorage.removeItem('indexPro_tradingCapital');
+      localStorage.removeItem('indexPro_activeBankroll');
       localStorage.removeItem('indexPro_saveAsDefault');
     }
-  }, [saveAsDefault, tradingCapital]);
+  }, [saveAsDefault, activeBankroll]);
 
-  const handleTradingCapitalChange = (value: string) => {
+  const handleActiveBankrollChange = (value: string) => {
     const numericValue = value.replace(/[^0-9]/g, '');
-    setTradingCapitalInput(numericValue);
+    setActiveBankrollInput(numericValue);
     const capital = Number(numericValue);
     if (capital > 0 || numericValue === '') {
-      setTradingCapital(capital || 0);
+      setActiveBankroll(capital || 0);
     }
   };
 
@@ -88,7 +88,7 @@ export function TradeImpactSimulator() {
 
   // Calculations
   const portfolioAllocation = convictionToAllocation(convictionLevel);
-  const portfolioValue = tradingCapital;
+  const portfolioValue = activeBankroll;
   const positionSize = portfolioValue * (portfolioAllocation / 100);
   const entryPrice = Number(targetEntryPrice) || 342.18;
   const exitPrice = Number(targetExitPrice) || 425.00;
@@ -99,7 +99,7 @@ export function TradeImpactSimulator() {
   // Expected alpha
   const baselineReturn = 8.5;
   // Calculate squeeze score from passive flow and short squeeze
-  const squeezeScore = Math.round(passiveFlowImpact * 0.6 + shortSqueezePotential * 0.4);
+  const squeezeScore = Math.round(institutionalGravity * 0.6 + exitFriction * 0.4);
   const buyPressureMultiplier = squeezeScore / 20; // Scale squeeze score to reasonable multiplier
   const convictionBonus = convictionLevel * 0.8;
   const expectedAlpha = baselineReturn + buyPressureMultiplier + convictionBonus;
@@ -113,10 +113,10 @@ export function TradeImpactSimulator() {
 
   // Stop-loss levels
   const stopLossLevels = {
-    low: [3, 5, 7],
-    medium: [5, 10, 15],
-    high: [10, 15, 20],
-    degenerate: [15, 25, 35],
+    defensive: [3, 5, 7],
+    balanced: [5, 10, 15],
+    aggressive: [10, 15, 20],
+    speculative: [15, 25, 35],
   };
 
   const stopLosses = stopLossLevels[riskTolerance];
@@ -175,7 +175,7 @@ export function TradeImpactSimulator() {
     });
   }
 
-  if (riskTolerance === 'degenerate' && portfolioAllocation > 12) {
+  if (riskTolerance === 'speculative' && portfolioAllocation > 12) {
     warnings.push({
       severity: 'danger',
       message: 'Extreme risk configuration detected',
@@ -197,10 +197,10 @@ export function TradeImpactSimulator() {
   };
 
   const riskToleranceConfig = {
-    low: { icon: Shield, color: 'bg-blue-500', label: 'Low' },
-    medium: { icon: Target, color: 'bg-green-500', label: 'Medium' },
-    high: { icon: Zap, color: 'bg-orange-500', label: 'High' },
-    degenerate: { icon: Flame, color: 'bg-red-500', label: 'Degenerate' },
+    defensive: { icon: Shield, color: 'bg-blue-500', label: 'Defensive' },
+    balanced: { icon: Target, color: 'bg-green-500', label: 'Balanced' },
+    aggressive: { icon: Zap, color: 'bg-orange-500', label: 'Aggressive' },
+    speculative: { icon: Flame, color: 'bg-red-500', label: 'Speculative' },
   };
 
   return (
@@ -252,8 +252,8 @@ export function TradeImpactSimulator() {
               </div>
               <input
                 type="text"
-                value={formatCurrency(tradingCapitalInput)}
-                onChange={(e) => handleTradingCapitalChange(e.target.value)}
+                value={formatCurrency(activeBankrollInput)}
+                onChange={(e) => handleActiveBankrollChange(e.target.value)}
                 placeholder="Enter capital"
                 className="w-full h-14 pl-12 pr-4 text-2xl font-semibold text-slate-900 bg-white border-2 border-slate-300 rounded-lg focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all"
               />
@@ -397,11 +397,11 @@ export function TradeImpactSimulator() {
 
           {/* Force Multiplier Advisor */}
           <div className="p-5 bg-white rounded-xl border border-slate-200 shadow-sm overflow-visible">
-            <ForceMultiplierGauge
-              passiveFlowImpact={passiveFlowImpact}
-              shortSqueezePotential={shortSqueezePotential}
-              onPassiveFlowChange={setPassiveFlowImpact}
-              onShortSqueezeChange={setShortSqueezePotential}
+            <PropulsionGauge
+              institutionalGravity={institutionalGravity}
+              exitFriction={exitFriction}
+              onInstitutionalGravityChange={setInstitutionalGravity}
+              onExitFrictionChange={setExitFriction}
             />
           </div>
         </div>

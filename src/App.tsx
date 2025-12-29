@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { UniverseMonitor } from './components/UniverseMonitor';
+import { UniverseMonitor } from './components/TheBoard';
 import { StockIntelligence } from './components/StockIntelligence';
-import { TradeImpactSimulator } from './components/TradeImpactSimulator';
+import { TradeImpactSimulator } from './components/ScenarioLab';
 import { MobileNavigation } from './components/MobileNavigation';
 import { AlertSettingsModal } from './components/AlertSettingsModal';
 import { useIsMobile } from './components/ui/use-mobile';
@@ -9,7 +9,7 @@ import { Bell, Settings } from 'lucide-react';
 
 export default function App() {
   const isMobile = useIsMobile();
-  const [mobileActiveTab, setMobileActiveTab] = useState<'universe' | 'intelligence' | 'alerts'>('universe');
+  const [mobileActiveTab, setMobileActiveTab] = useState<'board' | 'intelligence' | 'scenario'>('board');
   const [showAlertSettings, setShowAlertSettings] = useState(false);
 
   return (
@@ -23,7 +23,7 @@ export default function App() {
                 <span className="text-white text-base sm:text-lg">IP</span>
               </div>
               <h1 className="text-slate-900 text-base sm:text-lg">IndexPro</h1>
-              <span className="px-2 sm:px-2.5 py-0.5 sm:py-1 bg-indigo-50 text-indigo-700 rounded-full text-xs">Pro</span>
+              <span className="px-2 sm:px-2.5 py-0.5 sm:py-1 bg-indigo-50 text-indigo-700 rounded-full text-xs">Institutional</span>
             </div>
             <div className="flex items-center gap-2 sm:gap-3">
               {!isMobile && (
@@ -49,17 +49,17 @@ export default function App() {
       {/* Desktop View */}
       {!isMobile && (
         <div className="grid grid-cols-12 gap-6 p-6 max-w-[1800px] mx-auto">
-          {/* Left Column - Universe Monitor */}
+          {/* Left Column - The Board */}
           <div className="col-span-12 lg:col-span-3">
             <UniverseMonitor />
           </div>
 
-          {/* Center Column - Stock Intelligence */}
+          {/* Center Column - Core Analysis */}
           <div className="col-span-12 lg:col-span-5">
             <StockIntelligence />
           </div>
 
-          {/* Right Column - Trade Impact Simulator */}
+          {/* Right Column - Scenario Lab */}
           <div className="col-span-12 lg:col-span-4">
             <TradeImpactSimulator />
           </div>
@@ -69,22 +69,22 @@ export default function App() {
       {/* Mobile View with Tabs */}
       {isMobile && (
         <div className="pb-20">
-          {/* Tab 1: Universe */}
-          {mobileActiveTab === 'universe' && (
+          {/* Tab 1: The Board */}
+          {mobileActiveTab === 'board' && (
             <div className="p-4">
               <UniverseMonitor />
             </div>
           )}
 
-          {/* Tab 2: Intelligence */}
+          {/* Tab 2: Core Analysis */}
           {mobileActiveTab === 'intelligence' && (
             <div className="p-4">
               <StockIntelligence />
             </div>
           )}
 
-          {/* Tab 3: Alerts/Action */}
-          {mobileActiveTab === 'alerts' && (
+          {/* Tab 3: Scenario Lab */}
+          {mobileActiveTab === 'scenario' && (
             <div className="p-4 space-y-4">
               <TradeImpactSimulator />
             </div>

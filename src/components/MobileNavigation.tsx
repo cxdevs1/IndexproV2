@@ -1,8 +1,8 @@
 import { BarChart3, Target, Sparkles } from 'lucide-react';
 
 interface MobileNavigationProps {
-  activeTab: 'universe' | 'intelligence' | 'alerts';
-  onTabChange: (tab: 'universe' | 'intelligence' | 'alerts') => void;
+  activeTab: 'board' | 'intelligence' | 'scenario';
+  onTabChange: (tab: 'board' | 'intelligence' | 'scenario') => void;
 }
 
 export function MobileNavigation({ activeTab, onTabChange }: MobileNavigationProps) {
@@ -10,18 +10,18 @@ export function MobileNavigation({ activeTab, onTabChange }: MobileNavigationPro
     <div className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-xl border-t border-slate-200/50 shadow-lg z-50">
       <div className="grid grid-cols-3 h-16">
         <button
-          onClick={() => onTabChange('universe')}
+          onClick={() => onTabChange('board')}
           className={`relative flex flex-col items-center justify-center gap-1 min-h-[44px] transition-all ${
-            activeTab === 'universe'
+            activeTab === 'board'
               ? 'text-indigo-600'
               : 'text-slate-500 active:bg-slate-50'
           }`}
         >
-          {activeTab === 'universe' && (
+          {activeTab === 'board' && (
             <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-b-full"></div>
           )}
           <BarChart3 className="w-5 h-5" />
-          <span className="text-[10px] font-medium">Universe</span>
+          <span className="text-[10px] font-medium">The Board</span>
         </button>
 
         <button
@@ -36,22 +36,22 @@ export function MobileNavigation({ activeTab, onTabChange }: MobileNavigationPro
             <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-b-full"></div>
           )}
           <Target className="w-5 h-5" />
-          <span className="text-[10px] font-medium">Intelligence</span>
+          <span className="text-[10px] font-medium">Core Analysis</span>
         </button>
 
         <button
-          onClick={() => onTabChange('alerts')}
+          onClick={() => onTabChange('scenario')}
           className={`relative flex flex-col items-center justify-center gap-1 min-h-[44px] transition-all ${
-            activeTab === 'alerts'
+            activeTab === 'scenario'
               ? 'text-indigo-600'
               : 'text-slate-500 active:bg-slate-50'
           }`}
         >
-          {activeTab === 'alerts' && (
+          {activeTab === 'scenario' && (
             <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-b-full"></div>
           )}
           <Sparkles className="w-5 h-5" />
-          <span className="text-[10px] font-medium">Simulator</span>
+          <span className="text-[10px] font-medium">Scenario Lab</span>
         </button>
       </div>
     </div>
