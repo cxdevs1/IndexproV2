@@ -16,37 +16,37 @@ const journeySteps: JourneyStep[] = [
     id: 1,
     title: 'The Board',
     target: '[data-tour="board"]',
-    copy: "This is The Board. It's the waiting room for the S&P 500. We only track the top candidates mathematically ready for a promotion.",
+    copy: "Welcome to The Board. This is the waiting room for the S&P 500. Only the strongest candidates appear here.",
     icon: BarChart3,
     gradient: 'from-teal-500 to-cyan-600',
-    encouragement: "Let's begin"
+    encouragement: "Welcome"
   },
   {
     id: 2,
     title: 'Core Analysis',
     target: '[data-tour="intelligence"]',
-    copy: "Inside Core Analysis, we look at 'Alpha'—the extra profit potential. We check the 'Sector Vacuum' to see if the index is starving for a company just like this one.",
+    copy: "This is Core Analysis. We look for 'Sector Vacuums'—gaps in the index that must be filled by stocks like this.",
     icon: Brain,
     gradient: 'from-indigo-500 to-purple-600',
-    encouragement: "You're ready"
+    encouragement: "Nice"
   },
   {
     id: 3,
     title: 'The Playbook',
     target: '[data-tour="playbook"]',
-    copy: "Follow The Playbook. It tells you exactly when to build your position ('Vetting') and exactly when to take profits ('Harvesting'). Never guess an exit again.",
+    copy: "Your Playbook. It tells you exactly when to enter (High Confidence) and exactly when to take profits (Harvesting).",
     icon: Target,
     gradient: 'from-purple-500 to-pink-600',
-    encouragement: "Looking good"
+    encouragement: "Perfect"
   },
   {
     id: 4,
     title: 'Scenario Lab',
     target: '[data-tour="scenario"]',
-    copy: "Scenario Lab is your risk-testing ground. Plug in your bankroll and conviction to see how 'Institutional Gravity' and 'Exit Friction' will propel your P&L.",
+    copy: "The Scenario Lab. Model how 'Institutional Gravity' will pull the price up. Input your bankroll to see your projected Alpha.",
     icon: Calculator,
     gradient: 'from-blue-500 to-indigo-600',
-    encouragement: "Almost there"
+    encouragement: "You're ready"
   }
 ];
 
@@ -296,7 +296,7 @@ export function SpotlightMentorJourney({ isOpen, onClose }: SpotlightMentorJourn
           <rect
             width="100%"
             height="100%"
-            fill="rgba(15, 23, 42, 0.6)"
+            fill="rgba(15, 23, 42, 0.7)"
             mask="url(#spotlight-mask)"
           />
         </svg>
@@ -304,17 +304,38 @@ export function SpotlightMentorJourney({ isOpen, onClose }: SpotlightMentorJourn
 
       {/* Spotlight Border Animation */}
       {spotlightRect && (
-        <div
-          className="fixed z-[151] pointer-events-none animate-in fade-in duration-300"
-          style={{
-            left: spotlightRect.left - 24,
-            top: spotlightRect.top - 24,
-            width: spotlightRect.width + 48,
-            height: spotlightRect.height + 48,
-          }}
-        >
-          <div className="w-full h-full rounded-3xl border-4 border-indigo-400 shadow-2xl shadow-indigo-500/50 animate-pulse" />
-        </div>
+        <>
+          <div
+            className="fixed z-[151] pointer-events-none animate-in fade-in duration-300"
+            style={{
+              left: spotlightRect.left - 24,
+              top: spotlightRect.top - 24,
+              width: spotlightRect.width + 48,
+              height: spotlightRect.height + 48,
+            }}
+          >
+            <div className="w-full h-full rounded-3xl border-4 border-indigo-400 shadow-2xl shadow-indigo-500/50 animate-pulse" />
+          </div>
+
+          {/* Coach Mark - Animated Blue Dot */}
+          <div
+            className="fixed z-[152] pointer-events-none"
+            style={{
+              left: spotlightRect.left + spotlightRect.width / 2 - 6,
+              top: spotlightRect.top - 40,
+            }}
+          >
+            <div className="relative">
+              {/* Outer pulse rings */}
+              <div className="absolute inset-0 w-12 h-12 -translate-x-1/2 -translate-y-1/2">
+                <div className="absolute inset-0 bg-blue-400 rounded-full animate-ping opacity-75"></div>
+                <div className="absolute inset-2 bg-blue-500 rounded-full animate-ping opacity-50" style={{ animationDelay: '0.3s' }}></div>
+              </div>
+              {/* Core dot */}
+              <div className="relative w-3 h-3 bg-blue-500 rounded-full shadow-lg shadow-blue-500/50"></div>
+            </div>
+          </div>
+        </>
       )}
 
       {/* Floating Mentor Card */}
@@ -378,9 +399,9 @@ export function SpotlightMentorJourney({ isOpen, onClose }: SpotlightMentorJourn
                 onClick={handleNext}
                 className={`flex items-center justify-center gap-2 px-6 py-3.5 bg-gradient-to-r ${step.gradient} text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl transition-all ${
                   currentStep === 0 ? 'flex-1' : 'flex-1'
-                }`}
+                } ${currentStep === journeySteps.length - 1 ? 'ring-4 ring-indigo-300 ring-offset-2 shadow-2xl shadow-indigo-500/50' : ''}`}
               >
-                {currentStep === journeySteps.length - 1 ? "Finish Tour" : "Next Step"}
+                {currentStep === journeySteps.length - 1 ? "🎉 Finish Tour" : "Next Step"}
                 <ChevronRight className="w-5 h-5" />
               </button>
             </div>

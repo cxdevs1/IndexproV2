@@ -1,5 +1,6 @@
 import { Clock, TrendingUp, Zap, LogOut, CheckCircle2, AlertCircle } from 'lucide-react';
 import { useState } from 'react';
+import { InstructionIcon } from './InstructionIcon';
 
 interface Phase {
   id: string;
@@ -10,6 +11,8 @@ interface Phase {
   strategy: string;
   whyThisMatters: string;
   completedDate?: string;
+  actionLabel: string;
+  actionColor: string;
   icon: any;
   color: string;
   bgGradient: string;
@@ -25,6 +28,8 @@ const phases: Phase[] = [
     tacticalAdvice: 'Prime accumulation window. Build position gradually as score persistence builds conviction.',
     strategy: 'Best risk/reward period. Monitor score stability and institutional tracking signals.',
     whyThisMatters: 'Early entry gives you the lowest prices before the market catches on. You want to be positioned before announcement rumors start.',
+    actionLabel: 'ACTION: BUY',
+    actionColor: '#10b981',
     icon: Clock,
     color: '#3b82f6',
     bgGradient: 'from-blue-50 to-cyan-50',
@@ -37,6 +42,8 @@ const phases: Phase[] = [
     tacticalAdvice: 'Optimal entry window. Institutional tracking active. Continue position building.',
     strategy: 'Score stability confirms thesis. Continue accumulation if conviction remains high. Watch for Committee signals.',
     whyThisMatters: 'Score persistence above 70 means institutional algorithms are flagging this stock. They\'ll have to buy when it\'s officially added.',
+    actionLabel: 'ACTION: BUY',
+    actionColor: '#10b981',
     icon: TrendingUp,
     color: '#8b5cf6',
     bgGradient: 'from-purple-50 to-indigo-50',
@@ -49,6 +56,8 @@ const phases: Phase[] = [
     tacticalAdvice: 'Harvest 75% of position to secure gains and avoid news-cycle reversals.',
     strategy: 'High volatility expected. Best for momentum scalping. Gap-ups likely at market open.',
     whyThisMatters: 'Prices typically peak at the headline. Retail traders rush in, but smart money starts exiting. Lock in most of your gains here.',
+    actionLabel: 'ACTION: SELL 75%',
+    actionColor: '#f59e0b',
     icon: Zap,
     color: '#f59e0b',
     bgGradient: 'from-amber-50 to-orange-50',
@@ -61,6 +70,8 @@ const phases: Phase[] = [
     tacticalAdvice: 'Final exit. Institutional buying pressure complete. Maximize average exit price.',
     strategy: 'Institutional buying completes. Price stabilizes. Begin systematic exit across 3-5 sessions to optimize average exit price.',
     whyThisMatters: 'Once the big funds finish buying, the extra demand disappears. We want you out before the crowd realizes the party\'s over.',
+    actionLabel: 'ACTION: EXIT ALL',
+    actionColor: '#dc2626',
     icon: LogOut,
     color: '#10b981',
     bgGradient: 'from-green-50 to-emerald-50',
@@ -168,6 +179,18 @@ export function ThePlaybook() {
 
                       {/* Tactical Coaching - Prominent */}
                       <div className="bg-white/70 backdrop-blur-sm rounded-lg p-4 border border-slate-200 mb-3">
+                        {/* ACTION Label */}
+                        <div className="mb-3 pb-3 border-b border-slate-200">
+                          <div 
+                            className="inline-flex items-center px-4 py-2 rounded-lg shadow-md"
+                            style={{ backgroundColor: phase.actionColor }}
+                          >
+                            <span className="text-sm font-bold text-white tracking-wide">
+                              {phase.actionLabel}
+                            </span>
+                          </div>
+                        </div>
+                        
                         <div className="text-[10px] font-semibold text-slate-500 uppercase mb-2 tracking-wide">
                           Tactical Coaching
                         </div>

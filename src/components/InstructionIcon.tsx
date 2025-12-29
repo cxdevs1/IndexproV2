@@ -28,10 +28,10 @@ export function InstructionIcon({ term, explanation, example }: InstructionIconP
     <div className="relative inline-block" ref={popoverRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="inline-flex items-center justify-center w-[12px] h-[12px] rounded-full bg-indigo-100 hover:bg-indigo-200 transition-all cursor-help ml-1.5"
+        className="inline-flex items-center justify-center w-[12px] h-[12px] rounded-full bg-blue-100 hover:bg-blue-200 transition-all cursor-help ml-1.5 shadow-sm hover:shadow-md ring-2 ring-blue-400/30 hover:ring-blue-500/50"
         aria-label={`Learn about ${term}`}
       >
-        <HelpCircle className="w-[8px] h-[8px] text-indigo-600" />
+        <HelpCircle className="w-[8px] h-[8px] text-blue-600 animate-pulse" />
       </button>
 
       {isOpen && (
