@@ -38,6 +38,8 @@ export function TradeImpactSimulator() {
   const [targetExitPrice, setTargetExitPrice] = useState('425.00');
   const [showInstitutionalBenchmark, setShowInstitutionalBenchmark] = useState(false);
   const [marketCondition, setMarketCondition] = useState<MarketCondition>('bullish');
+  const [aiAutoPilot, setAiAutoPilot] = useState(false);
+  const [isCalculatingAI, setIsCalculatingAI] = useState(false);
 
   // Load saved active bankroll
   useEffect(() => {
@@ -69,6 +71,27 @@ export function TradeImpactSimulator() {
     if (capital > 0 || numericValue === '') {
       setActiveBankroll(capital || 0);
     }
+  };
+
+  const handleCalculateNeural = async () => {
+    setIsCalculatingAI(true);
+    setAiAutoPilot(false); // Reset state
+    
+    // Simulate 2-second AI processing
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    // Auto-set market condition based on VIX simulation
+    const simulatedVIX = Math.random() * 40; // Random VIX between 0-40
+    if (simulatedVIX > 30) {
+      setMarketCondition('stress');
+    } else if (simulatedVIX > 20) {
+      setMarketCondition('sideways');
+    } else {
+      setMarketCondition('bullish');
+    }
+    
+    setAiAutoPilot(true);
+    setIsCalculatingAI(false);
   };
 
   const formatCurrency = (value: string) => {
@@ -307,24 +330,68 @@ export function TradeImpactSimulator() {
 
           {/* Market Condition Toggle - NEW */}
           <div className="mb-6 p-5 bg-gradient-to-br from-slate-50 to-indigo-50 rounded-xl border-2 border-slate-200 shadow-sm">
+            {/* AI Auto-Pilot Button - On Demand */}
+            <div className="flex items-center justify-between mb-4 pb-4 border-b border-slate-300">
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg flex items-center justify-center">
+                  <Sparkles className="w-4 h-4 text-white" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-sm font-semibold text-slate-900">AI Auto-Pilot</span>
+                    <MentorshipTooltip 
+                      term="AI Auto-Pilot"
+                      definition="Automatically adjusts your P&L projections based on real-time market volatility (VIX) and systemic correlation."
+                      position="right"
+                    />
+                  </div>
+                  <div className="text-xs text-slate-600">On-demand neural market analysis</div>
+                </div>
+              </div>
+              <button
+                onClick={handleCalculateNeural}
+                disabled={isCalculatingAI}
+                className={`px-4 py-2 rounded-lg font-semibold text-sm transition-all ${
+                  isCalculatingAI
+                    ? 'bg-slate-300 text-slate-500 cursor-not-allowed'
+                    : aiAutoPilot
+                    ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-md'
+                    : 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-md hover:shadow-lg'
+                }`}
+              >
+                {isCalculatingAI ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                    <span>Analyzing...</span>
+                  </div>
+                ) : aiAutoPilot ? (
+                  '✓ Applied'
+                ) : (
+                  'Calculate Neural'
+                )}
+              </button>
+            </div>
+
             <div className="flex items-center gap-2 mb-4">
               <div className="w-8 h-8 bg-slate-700 rounded-lg flex items-center justify-center">
                 <Activity className="w-4 h-4 text-white" />
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-1">
-                  <label className="text-sm font-medium text-slate-900">Market Condition</label>
+                  <label className={`text-sm font-medium ${aiAutoPilot ? 'text-slate-500' : 'text-slate-900'}`}>Market Condition</label>
                   <MentorshipTooltip 
                     term="Market Stress Test"
                     definition="Institutional desks never model in a vacuum. This shows if your inclusion trade can survive a broader market slide."
                     position="right"
                   />
                 </div>
-                <div className="text-xs text-slate-600">Adjust alpha expectations for market headwinds</div>
+                <div className={`text-xs ${aiAutoPilot ? 'text-slate-500' : 'text-slate-600'}`}>
+                  {aiAutoPilot ? 'AI is controlling market analysis' : 'Adjust alpha expectations for market headwinds'}
+                </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-2">
+            <div className={`grid grid-cols-3 gap-2 ${aiAutoPilot ? 'opacity-50 pointer-events-none' : ''}`}>
               <button
                 onClick={() => setMarketCondition('bullish')}
                 className={`p-3 rounded-xl border-2 transition-all ${

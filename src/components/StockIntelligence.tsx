@@ -1,5 +1,5 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
-import { CheckCircle2, XCircle, AlertCircle, TrendingUp, ShieldAlert, ShieldCheck, Info, CircleDot, Circle, DollarSign, BarChart3, Droplets, Building2, Wallet, Activity, Zap, Target as TargetIcon } from 'lucide-react';
+import { CheckCircle2, XCircle, AlertCircle, TrendingUp, ShieldAlert, ShieldCheck, Info, CircleDot, Circle, DollarSign, BarChart3, Droplets, Building2, Wallet, Activity, Zap, Target as TargetIcon, Lock, Brain, Sparkles, Clock } from 'lucide-react';
 import { useState } from 'react';
 import { useIsMobile } from './ui/use-mobile';
 import { ThePlaybook } from './ThePlaybook';
@@ -47,7 +47,10 @@ export function StockIntelligence() {
   const marketCap = '$8.2B';
   const avgVolume = '42M';
   const publicFloat = '48%';
+  const borrowCapacity = 'Low'; // Low, Medium, High
   const scoreChange = 22; // points increased over 90 days
+  const neuralConfidence = 88; // AI confidence percentage (0-100)
+  const lastSynced = '2h ago'; // Last data sync timestamp
 
   const passCount = committeeChecklist.filter(item => item.status === 'pass').length;
   const totalCount = committeeChecklist.length;
@@ -92,7 +95,12 @@ export function StockIntelligence() {
                     <span className="text-xs text-indigo-100">S&P 600 SmallCap</span>
                   </div>
                 </div>
-                <p className="text-lg text-indigo-100">{currentCompany}</p>
+                <p className="text-lg text-indigo-100 mb-2">{currentCompany}</p>
+                {/* Last Synced Timestamp - Build Trust */}
+                <div className="flex items-center gap-1.5 text-indigo-200/80">
+                  <Clock className="w-3.5 h-3.5" />
+                  <span className="text-xs">Data synced: {lastSynced}</span>
+                </div>
               </div>
               
               <div className="text-right">
@@ -106,7 +114,7 @@ export function StockIntelligence() {
             </div>
 
             {/* Quick Stats Row */}
-            <div className="grid grid-cols-4 gap-3">
+            <div className="grid grid-cols-5 gap-3">
               <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-3">
                 <div className="flex items-center gap-2 mb-1">
                   <BarChart3 className="w-3.5 h-3.5 text-indigo-200" />
@@ -127,6 +135,28 @@ export function StockIntelligence() {
                   <div className="text-xs text-indigo-200">Float</div>
                 </div>
                 <div className="text-lg font-semibold text-white">{publicFloat}</div>
+              </div>
+              <div className={`backdrop-blur-sm rounded-lg p-3 transition-all border-2 ${
+                borrowCapacity === 'Low'
+                  ? 'bg-gradient-to-br from-red-400/30 to-rose-400/30 border-red-300/60 shadow-lg ring-2 ring-red-200/50'
+                  : borrowCapacity === 'Medium'
+                  ? 'bg-white/10 border-white/20'
+                  : 'bg-green-500/20 border-green-300/30'
+              }`}>
+                <div className="flex items-center gap-1.5 mb-1">
+                  <Lock className={`w-3.5 h-3.5 ${borrowCapacity === 'Low' ? 'text-red-100' : 'text-indigo-200'}`} />
+                  <div className={`text-xs font-medium ${borrowCapacity === 'Low' ? 'text-red-50' : 'text-indigo-200'}`}>
+                    Borrow Cap
+                  </div>
+                  <MentorshipTooltip 
+                    term="Borrow Capacity"
+                    definition="Tells us if there are still shares available for short-sellers to choke on. If capacity is 'Low', the squeeze is already at maximum pressure."
+                    position="bottom"
+                  />
+                </div>
+                <div className={`text-lg font-semibold ${borrowCapacity === 'Low' ? 'text-white' : 'text-white'}`}>
+                  {borrowCapacity}
+                </div>
               </div>
               <div className={`backdrop-blur-sm rounded-lg p-3 transition-all ${
                 thirtyDayMove > 15 
@@ -181,15 +211,39 @@ export function StockIntelligence() {
               <p className="text-sm text-slate-500">90-day inclusion score trend</p>
             </div>
             
-            {/* Current Score Badge - Prominent */}
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl blur-lg opacity-30 animate-pulse"></div>
-              <div className="relative bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl px-6 py-4 shadow-lg border-2 border-green-400">
-                <div className="text-xs text-green-100 mb-1 text-center">Current Score</div>
-                <div className="text-4xl font-bold text-white text-center">{currentScore}</div>
-                <div className="flex items-center justify-center gap-1 mt-1">
-                  <TrendingUp className="w-3 h-3 text-green-200" />
-                  <span className="text-xs text-green-100">+{scoreChange} pts</span>
+            {/* Dual Badge Layout: Current Score + AI Confidence */}
+            <div className="flex items-center gap-4">
+              {/* Current Score Badge */}
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl blur-lg opacity-30 animate-pulse"></div>
+                <div className="relative bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl px-6 py-4 shadow-lg border-2 border-green-400">
+                  <div className="text-xs text-green-100 mb-1 text-center">Current Score</div>
+                  <div className="text-4xl font-bold text-white text-center">{currentScore}</div>
+                  <div className="flex items-center justify-center gap-1 mt-1">
+                    <TrendingUp className="w-3 h-3 text-green-200" />
+                    <span className="text-xs text-green-100">+{scoreChange} pts</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Neural Confidence Badge - AI Powered */}
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-xl blur-lg opacity-25 animate-pulse"></div>
+                <div className="relative bg-gradient-to-br from-cyan-500 via-blue-500 to-indigo-600 rounded-xl px-5 py-4 shadow-lg border-2 border-cyan-300">
+                  <div className="flex items-center justify-center gap-1.5 mb-1">
+                    <Brain className="w-3.5 h-3.5 text-cyan-100 animate-pulse" />
+                    <div className="text-xs text-cyan-100">AI Confidence</div>
+                    <MentorshipTooltip 
+                      term="Neural Confidence"
+                      definition="Our AI cross-references this ticker with 10 years of historical S&P inclusions to predict the likelihood of a successful 'Launch State'."
+                      position="bottom"
+                    />
+                  </div>
+                  <div className="text-3xl font-bold text-white text-center mb-0.5">{neuralConfidence}%</div>
+                  <div className="flex items-center justify-center gap-1">
+                    <Sparkles className="w-2.5 h-2.5 text-cyan-200" />
+                    <span className="text-[10px] text-cyan-100 uppercase tracking-wide font-semibold">High</span>
+                  </div>
                 </div>
               </div>
             </div>

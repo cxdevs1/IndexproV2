@@ -1,4 +1,4 @@
-import { Clock, TrendingUp, Zap, LogOut, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Clock, TrendingUp, Zap, LogOut, CheckCircle2, AlertCircle, Radio, Shield, Timer } from 'lucide-react';
 import { useState } from 'react';
 import { MentorshipTooltip } from './MentorshipTooltip';
 
@@ -16,6 +16,7 @@ interface Phase {
   icon: any;
   color: string;
   bgGradient: string;
+  daysToEvent?: number; // T-minus countdown
 }
 
 const phases: Phase[] = [
@@ -47,6 +48,7 @@ const phases: Phase[] = [
     icon: TrendingUp,
     color: '#8b5cf6',
     bgGradient: 'from-purple-50 to-indigo-50',
+    daysToEvent: 30, // T-minus 30 days
   },
   {
     id: 'announcement',
@@ -75,6 +77,7 @@ const phases: Phase[] = [
     icon: LogOut,
     color: '#10b981',
     bgGradient: 'from-green-50 to-emerald-50',
+    daysToEvent: 2, // T-minus 2 days (Starts in T-2 Days)
   },
 ];
 
@@ -196,6 +199,15 @@ export function ThePlaybook() {
                                 </span>
                               </div>
                             )}
+                            {/* T-Minus Countdown for upcoming phases */}
+                            {phase.status === 'upcoming' && phase.daysToEvent && (
+                              <div className="flex items-center gap-1.5 mt-1">
+                                <Clock className="w-3 h-3 text-indigo-600" />
+                                <span className="text-[10px] text-indigo-700 font-semibold">
+                                  Starts in T-{phase.daysToEvent} Days
+                                </span>
+                              </div>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -245,6 +257,67 @@ export function ThePlaybook() {
                           </p>
                         </div>
                       )}
+
+                      {/* Hard Deck (Stop-Loss) - For High Confidence and Announcement */}
+                      {isSelected && (phase.id === 'high-confidence' || phase.id === 'announcement') && (
+                        <div className="mt-3 pt-3 border-t border-slate-200/60">
+                          <div className="flex items-start gap-3 p-3 bg-red-50 border-2 border-red-300 rounded-lg">
+                            <div className="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                              <Shield className="w-4 h-4 text-white" />
+                            </div>
+                            <div className="flex-1">
+                              <div className="text-xs font-semibold text-red-900 mb-1 uppercase tracking-wide">
+                                Hard Deck (Stop-Loss)
+                              </div>
+                              <div className="text-sm font-bold text-red-700">
+                                ${phase.id === 'high-confidence' ? '295.00' : '315.00'}
+                              </div>
+                              <div className="text-xs text-red-600 mt-1">
+                                Thesis invalidated if price closes below this level
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Live Event Monitor - For Announcement only */}
+                      {phase.id === 'announcement' && (
+                        <div className="mt-3">
+                          <div className="flex items-center gap-2 p-3 bg-gradient-to-r from-amber-100 to-orange-100 border-2 border-amber-300 rounded-lg">
+                            <div className="relative">
+                              <Radio className="w-4 h-4 text-amber-700" />
+                              <div className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-amber-500 rounded-full animate-pulse"></div>
+                            </div>
+                            <div className="flex-1">
+                              <div className="text-xs font-semibold text-amber-900">
+                                Live Event Monitor
+                              </div>
+                              <div className="text-[10px] text-amber-700">
+                                Monitoring S&P Committee wires for official ticker confirmation
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Launch Window Decay - For High Confidence only */}
+                      {phase.id === 'high-confidence' && (
+                        <div className="mt-3">
+                          <div className="flex items-center gap-2 p-3 bg-gradient-to-r from-purple-100 to-indigo-100 border-2 border-purple-300 rounded-lg">
+                            <div className="relative">
+                              <Timer className="w-4 h-4 text-purple-700 animate-pulse" />
+                            </div>
+                            <div className="flex-1">
+                              <div className="text-xs font-semibold text-purple-900 mb-0.5">
+                                Launch Window Decay
+                              </div>
+                              <div className="text-[10px] text-purple-700">
+                                Estimated <span className="font-bold">14 days</span> remaining in the optimal entry zone based on current accumulation velocity
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -264,6 +337,23 @@ export function ThePlaybook() {
             <div className="text-xs font-semibold text-indigo-900 mb-1">Current Phase: High Confidence</div>
             <p className="text-xs text-indigo-700 leading-relaxed">
               Optimal entry window. Institutional tracking active. Announcement expected within 30 days.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Defensive Note - VIX Risk Management */}
+      <div className="mt-4 p-4 bg-gradient-to-br from-slate-100 to-slate-200 rounded-xl border-2 border-slate-300">
+        <div className="flex items-start gap-3">
+          <div className="w-8 h-8 bg-slate-700 rounded-lg flex items-center justify-center flex-shrink-0">
+            <Shield className="w-4 h-4 text-white" />
+          </div>
+          <div className="flex-1">
+            <div className="text-xs font-semibold text-slate-900 mb-1 uppercase tracking-wide">
+              ⚠️ Defensive Note
+            </div>
+            <p className="text-xs text-slate-700 leading-relaxed">
+              If <span className="font-semibold">VIX &gt; 30</span>, reduce standard position weighting by <span className="font-semibold">50%</span> to account for systemic liquidity risk.
             </p>
           </div>
         </div>
