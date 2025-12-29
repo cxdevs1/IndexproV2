@@ -119,7 +119,7 @@ export function UniverseMonitor() {
   };
 
   return (
-    <>
+    <div className="space-y-6" data-tour="board" id="the-board">
       {/* Vacancy Monitor */}
       <VacancyMonitor />
 
@@ -507,6 +507,6 @@ export function UniverseMonitor() {
           </div>
         </>
       )}
-    </>
+    </div>
   );
 }

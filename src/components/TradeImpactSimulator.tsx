@@ -204,29 +204,27 @@ export function TradeImpactSimulator() {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
-      {/* Unified Header - Brand Identity */}
-      <div className="bg-gradient-to-br from-indigo-600 via-purple-600 to-purple-700 p-6 relative overflow-hidden">
-        {/* Decorative gradient orbs */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
-        <div className="absolute -bottom-8 -left-8 w-48 h-48 bg-indigo-400/20 rounded-full blur-2xl"></div>
-        
-        <div className="relative z-10 flex items-center gap-3">
-          <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center border border-white/30 shadow-lg">
-            <Sparkles className="w-6 h-6 text-white" />
-          </div>
-          <div>
-            <h3 className="text-white text-xl font-semibold">Scenario Lab</h3>
-            <p className="text-indigo-100 text-sm">Conviction-based modeling with institutional guardrails</p>
+    <div className="space-y-6" data-tour="scenario">
+      {/* Main Scenario Lab Card */}
+      <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
+        {/* Header - Unified Brand Identity */}
+        <div className="bg-gradient-to-br from-indigo-600 via-purple-600 to-indigo-700 p-5 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full blur-3xl"></div>
+          <div className="absolute -bottom-8 -left-8 w-32 h-32 bg-indigo-400/20 rounded-full blur-2xl"></div>
+          
+          <div className="relative z-10 flex items-center gap-3">
+            <div className="w-11 h-11 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center border border-white/30 shadow-lg">
+              <Sparkles className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h3 className="text-white font-semibold">Scenario Lab</h3>
+              <p className="text-slate-300 text-xs">Model your trade before risking a dollar</p>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Unified Body - Scrollable Content with Visual Flow */}
-      <div>
-        
-        {/* Section 1: Position Configuration - INPUT ZONE */}
-        <div className="p-6 bg-gradient-to-br from-white to-slate-50">
+        {/* Section 1: Active Bankroll - INPUT ZONE */}
+        <div className="p-6 bg-gradient-to-br from-white to-indigo-50" id="active-bankroll">
           <div className="flex items-center gap-2 mb-5">
             <div className="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center">
               <Target className="w-4 h-4 text-indigo-600" />
@@ -291,7 +289,7 @@ export function TradeImpactSimulator() {
           </div>
 
           {/* Conviction & Risk in Compact Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6" id="risk-toggles">
             {/* Conviction Level */}
             <div className="p-4 bg-white rounded-xl border border-slate-200 shadow-sm">
               <div className="flex items-center justify-between mb-3">
@@ -396,7 +394,7 @@ export function TradeImpactSimulator() {
           </div>
 
           {/* Force Multiplier Advisor */}
-          <div className="p-5 bg-white rounded-xl border border-slate-200 shadow-sm overflow-visible">
+          <div className="p-5 bg-white rounded-xl border border-slate-200 shadow-sm overflow-visible" id="propulsion-gauge">
             <PropulsionGauge
               institutionalGravity={institutionalGravity}
               exitFriction={exitFriction}

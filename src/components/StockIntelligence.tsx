@@ -70,7 +70,7 @@ export function StockIntelligence() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-tour="intelligence" id="core-analysis">
       {/* Unified Intelligence Card */}
       <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
         {/* Header Section - Compact & Elegant */}
