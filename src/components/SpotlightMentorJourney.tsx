@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Sparkles, ChevronRight, X, BarChart3, Brain, Target, Calculator } from 'lucide-react';
+import { Sparkles, ChevronRight, X, BarChart3, Brain, Target, Calculator, HelpCircle, ChevronDown } from 'lucide-react';
 
 interface JourneyStep {
   id: number;
@@ -9,6 +9,9 @@ interface JourneyStep {
   icon: any;
   gradient: string;
   encouragement: string;
+  anchorPosition: 'top-left' | 'center' | 'bottom' | 'right';
+  learnTerm?: string;
+  learnDefinition?: string;
 }
 
 const journeySteps: JourneyStep[] = [
@@ -16,37 +19,49 @@ const journeySteps: JourneyStep[] = [
     id: 1,
     title: 'The Board',
     target: '[data-tour="board"]',
-    copy: "Welcome to The Board. This is the waiting room for the S&P 500. Only the strongest candidates appear here.",
+    copy: "This is The Board. Tap any ticker to dive deep.",
     icon: BarChart3,
     gradient: 'from-teal-500 to-cyan-600',
-    encouragement: "Welcome"
+    encouragement: "Welcome",
+    anchorPosition: 'top-left',
+    learnTerm: 'The Board',
+    learnDefinition: 'The Board shows stocks that are being considered for S&P inclusion. Think of it like a waiting room—only the strongest companies make it here, and even fewer get promoted to the actual index.'
   },
   {
     id: 2,
     title: 'Core Analysis',
     target: '[data-tour="intelligence"]',
-    copy: "This is Core Analysis. We look for 'Sector Vacuums'—gaps in the index that must be filled by stocks like this.",
+    copy: "Here is your Core Analysis. We look for the 'Sector Vacuum'—where the index needs this stock.",
     icon: Brain,
     gradient: 'from-indigo-500 to-purple-600',
-    encouragement: "Nice"
+    encouragement: "Nice",
+    anchorPosition: 'center',
+    learnTerm: 'Sector Vacuum',
+    learnDefinition: 'A Sector Vacuum happens when an index is underweight in a specific industry. When there\'s a gap, the index committee must fill it—creating a buying opportunity for smart traders who spot it early.'
   },
   {
     id: 3,
     title: 'The Playbook',
     target: '[data-tour="playbook"]',
-    copy: "Your Playbook. It tells you exactly when to enter (High Confidence) and exactly when to take profits (Harvesting).",
+    copy: "The Playbook is your timing coach. It tells you exactly when to build and when to harvest.",
     icon: Target,
     gradient: 'from-purple-500 to-pink-600',
-    encouragement: "Perfect"
+    encouragement: "Perfect",
+    anchorPosition: 'bottom',
+    learnTerm: 'Harvesting',
+    learnDefinition: 'Harvesting means taking profits at the optimal time. We sell 75% when the headline hits (peak hype), then exit the rest after institutions finish buying. This locks in gains before the crowd realizes the party is over.'
   },
   {
     id: 4,
     title: 'Scenario Lab',
     target: '[data-tour="scenario"]',
-    copy: "The Scenario Lab. Model how 'Institutional Gravity' will pull the price up. Input your bankroll to see your projected Alpha.",
+    copy: "Scenario Lab. Plug in your bankroll to see your projected Alpha move.",
     icon: Calculator,
     gradient: 'from-blue-500 to-indigo-600',
-    encouragement: "You're ready"
+    encouragement: "You're ready",
+    anchorPosition: 'right',
+    learnTerm: 'Alpha',
+    learnDefinition: 'Alpha is just a fancy word for "Extra Profit." Most people get average returns matching the market. We use index inclusion math to help you capture the extra gains that come from forced institutional buying.'
   }
 ];
 
@@ -60,6 +75,8 @@ export function SpotlightMentorJourney({ isOpen, onClose }: SpotlightMentorJourn
   const [showWelcome, setShowWelcome] = useState(true);
   const [spotlightRect, setSpotlightRect] = useState<DOMRect | null>(null);
   const [cardPosition, setCardPosition] = useState<'top' | 'bottom' | 'left' | 'right'>('bottom');
+  const [showLearnTerm, setShowLearnTerm] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -115,6 +132,24 @@ export function SpotlightMentorJourney({ isOpen, onClose }: SpotlightMentorJourn
     }
   }, [isOpen, onClose]);
 
+  useEffect(() => {
+    const currentRef = document.querySelector('[data-tour="board"]');
+    if (currentRef) {
+      const rect = currentRef.getBoundingClientRect();
+      setSpotlightRect(rect);
+    }
+  }, []);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   if (!isOpen) return null;
 
   const handleStartJourney = () => {
@@ -122,6 +157,7 @@ export function SpotlightMentorJourney({ isOpen, onClose }: SpotlightMentorJourn
   };
 
   const handleNext = () => {
+    setShowLearnTerm(false); // Reset Learn Term expansion
     if (currentStep < journeySteps.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
@@ -275,6 +311,13 @@ export function SpotlightMentorJourney({ isOpen, onClose }: SpotlightMentorJourn
 
   return (
     <>
+      {/* Clickable Dimmed Background - Click to skip */}
+      <div 
+        className="fixed inset-0 z-[149] cursor-pointer" 
+        onClick={handleSkip}
+        aria-label="Click to skip tour"
+      />
+      
       {/* Dimmed Background with Dynamic Spotlight Cutout */}
       <div className="fixed inset-0 z-[150] pointer-events-none">
         <svg className="w-full h-full">
@@ -381,9 +424,37 @@ export function SpotlightMentorJourney({ isOpen, onClose }: SpotlightMentorJourn
             </div>
 
             {/* Copy */}
-            <p className="text-base text-slate-700 leading-relaxed mb-8">
+            <p className="text-base text-slate-700 leading-relaxed mb-4">
               {step.copy}
             </p>
+
+            {/* Progressive Disclosure - Learn Term */}
+            {step.learnTerm && step.learnDefinition && (
+              <div className="mb-8">
+                <button
+                  onClick={() => setShowLearnTerm(!showLearnTerm)}
+                  className="flex items-center gap-2 text-sm font-semibold text-indigo-600 hover:text-indigo-700 transition-colors"
+                >
+                  <HelpCircle className="w-4 h-4" />
+                  <span>Learn: What is "{step.learnTerm}"?</span>
+                  <ChevronDown className={`w-4 h-4 transition-transform ${showLearnTerm ? 'rotate-180' : ''}`} />
+                </button>
+                
+                {showLearnTerm && (
+                  <div className="mt-3 p-4 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl border border-indigo-200 animate-in fade-in slide-in-from-top-2 duration-200">
+                    <div className="flex items-start gap-3">
+                      <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <HelpCircle className="w-4 h-4 text-white" />
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-indigo-900 mb-2">{step.learnTerm}</h4>
+                        <p className="text-sm text-indigo-800 leading-relaxed">{step.learnDefinition}</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Navigation */}
             <div className="flex gap-3">
