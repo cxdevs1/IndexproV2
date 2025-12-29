@@ -8,6 +8,8 @@ interface Phase {
   status: 'upcoming' | 'active' | 'completed';
   tacticalAdvice: string;
   strategy: string;
+  whyThisMatters: string;
+  completedDate?: string;
   icon: any;
   color: string;
   bgGradient: string;
@@ -19,8 +21,10 @@ const phases: Phase[] = [
     title: 'Vetting',
     timeframe: 'Days 1-30',
     status: 'completed',
+    completedDate: 'Feb 15, 2025',
     tacticalAdvice: 'Prime accumulation window. Build position gradually as score persistence builds conviction.',
     strategy: 'Best risk/reward period. Monitor score stability and institutional tracking signals.',
+    whyThisMatters: 'Early entry gives you the lowest prices before the market catches on. You want to be positioned before announcement rumors start.',
     icon: Clock,
     color: '#3b82f6',
     bgGradient: 'from-blue-50 to-cyan-50',
@@ -32,6 +36,7 @@ const phases: Phase[] = [
     status: 'active',
     tacticalAdvice: 'Optimal entry window. Institutional tracking active. Continue position building.',
     strategy: 'Score stability confirms thesis. Continue accumulation if conviction remains high. Watch for Committee signals.',
+    whyThisMatters: 'Score persistence above 70 means institutional algorithms are flagging this stock. They\'ll have to buy when it\'s officially added.',
     icon: TrendingUp,
     color: '#8b5cf6',
     bgGradient: 'from-purple-50 to-indigo-50',
@@ -43,6 +48,7 @@ const phases: Phase[] = [
     status: 'upcoming',
     tacticalAdvice: 'Harvest 75% of position to secure gains and avoid news-cycle reversals.',
     strategy: 'High volatility expected. Best for momentum scalping. Gap-ups likely at market open.',
+    whyThisMatters: 'Prices typically peak at the headline. Retail traders rush in, but smart money starts exiting. Lock in most of your gains here.',
     icon: Zap,
     color: '#f59e0b',
     bgGradient: 'from-amber-50 to-orange-50',
@@ -54,6 +60,7 @@ const phases: Phase[] = [
     status: 'upcoming',
     tacticalAdvice: 'Final exit. Institutional buying pressure complete. Maximize average exit price.',
     strategy: 'Institutional buying completes. Price stabilizes. Begin systematic exit across 3-5 sessions to optimize average exit price.',
+    whyThisMatters: 'Once the big funds finish buying, the extra demand disappears. We want you out before the crowd realizes the party\'s over.',
     icon: LogOut,
     color: '#10b981',
     bgGradient: 'from-green-50 to-emerald-50',
@@ -70,7 +77,7 @@ export function ThePlaybook() {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" data-tour="playbook">
       {/* Header */}
       <div className="flex items-center gap-3 mb-2">
         <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
@@ -147,6 +154,14 @@ export function ThePlaybook() {
                               )}
                             </h5>
                             <p className="text-xs text-slate-600">{phase.timeframe}</p>
+                            {phase.status === 'completed' && phase.completedDate && (
+                              <div className="flex items-center gap-1.5 mt-1">
+                                <CheckCircle2 className="w-3 h-3 text-green-600" />
+                                <span className="text-[10px] text-green-700 font-medium">
+                                  Completed {phase.completedDate}
+                                </span>
+                              </div>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -169,6 +184,18 @@ export function ThePlaybook() {
                           </div>
                           <p className="text-sm text-slate-700 leading-relaxed">
                             {phase.strategy}
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Why This Matters */}
+                      {isSelected && (
+                        <div className="mt-3 pt-3 border-t border-slate-200/60">
+                          <div className="text-xs font-medium text-slate-600 mb-1 uppercase tracking-wide">
+                            Why This Matters
+                          </div>
+                          <p className="text-sm text-slate-600 leading-relaxed" style={{ fontWeight: 400 }}>
+                            {phase.whyThisMatters}
                           </p>
                         </div>
                       )}
