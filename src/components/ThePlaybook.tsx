@@ -1,6 +1,6 @@
 import { Clock, TrendingUp, Zap, LogOut, CheckCircle2, AlertCircle } from 'lucide-react';
 import { useState } from 'react';
-import { InstructionIcon } from './InstructionIcon';
+import { MentorshipTooltip } from './MentorshipTooltip';
 
 interface Phase {
   id: string;
@@ -156,14 +156,30 @@ export function ThePlaybook() {
                             <PhaseIcon className="w-6 h-6 text-white" />
                           </div>
                           <div className="flex-1">
-                            <h5 className="font-semibold text-slate-900 flex items-center gap-2">
-                              {phase.title}
+                            <div className="flex items-center gap-2">
+                              <h5 className="font-semibold text-slate-900 flex items-center gap-1">
+                                {phase.title}
+                                {phase.id === 'vetting' && (
+                                  <MentorshipTooltip 
+                                    term="Vetting"
+                                    definition="The Vetting phase is when the S&P Committee evaluates whether a stock meets inclusion criteria. This is your prime accumulation window—lowest prices before the market catches on."
+                                    position="bottom"
+                                  />
+                                )}
+                                {phase.id === 'harvesting' && (
+                                  <MentorshipTooltip 
+                                    term="Harvesting"
+                                    definition="Harvesting means taking profits at the optimal time. We sell 75% when the headline hits (peak hype), then exit the rest after institutions finish buying. This locks in gains before the crowd realizes the party is over."
+                                    position="bottom"
+                                  />
+                                )}
+                              </h5>
                               {isActive && (
                                 <span className="px-2 py-0.5 bg-purple-600 text-white text-[10px] font-semibold rounded-full">
                                   ACTIVE
                                 </span>
                               )}
-                            </h5>
+                            </div>
                             <p className="text-xs text-slate-600">{phase.timeframe}</p>
                             {phase.status === 'completed' && phase.completedDate && (
                               <div className="flex items-center gap-1.5 mt-1">

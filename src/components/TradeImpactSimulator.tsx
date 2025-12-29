@@ -3,6 +3,7 @@ import { TrendingUp, TrendingDown, Target, Sparkles, Info, ArrowUpRight, ArrowDo
 import { useState, useEffect } from 'react';
 import { useIsMobile } from './ui/use-mobile';
 import { PropulsionGauge } from './PropulsionGauge';
+import { MentorshipTooltip } from './MentorshipTooltip';
 
 interface HistoricalComp {
   ticker: string;
@@ -206,18 +207,25 @@ export function TradeImpactSimulator() {
   return (
     <div className="space-y-6" data-tour="scenario">
       {/* Main Scenario Lab Card */}
-      <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
+      <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-visible">
         {/* Header - Unified Brand Identity */}
-        <div className="bg-gradient-to-br from-indigo-600 via-purple-600 to-indigo-700 p-5 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full blur-3xl"></div>
-          <div className="absolute -bottom-8 -left-8 w-32 h-32 bg-indigo-400/20 rounded-full blur-2xl"></div>
+        <div className="bg-gradient-to-br from-indigo-600 via-purple-600 to-indigo-700 p-5 relative overflow-visible rounded-t-xl">
+          <div className="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
+          <div className="absolute -bottom-8 -left-8 w-32 h-32 bg-indigo-400/20 rounded-full blur-2xl pointer-events-none"></div>
           
           <div className="relative z-10 flex items-center gap-3">
             <div className="w-11 h-11 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center border border-white/30 shadow-lg">
               <Sparkles className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h3 className="text-white font-semibold">Scenario Lab</h3>
+              <div className="flex items-center gap-2">
+                <h3 className="text-white font-semibold">Scenario Lab</h3>
+                <MentorshipTooltip 
+                  term="Scenario Lab"
+                  definition="Model your trade before risking a dollar. Test different position sizes, risk levels, and market conditions to see your potential profit or loss."
+                  position="bottom"
+                />
+              </div>
               <p className="text-slate-300 text-xs">Model your trade before risking a dollar</p>
             </div>
           </div>
@@ -239,7 +247,14 @@ export function TradeImpactSimulator() {
                 <Wallet className="w-5 h-5 text-white" />
               </div>
               <div>
-                <label className="text-sm font-medium text-slate-700">Total Trading Capital</label>
+                <div className="flex items-center gap-1">
+                  <label className="text-sm font-medium text-slate-700">Active Bankroll</label>
+                  <MentorshipTooltip 
+                    term="Active Bankroll"
+                    definition="Your Active Bankroll is the cash you're putting into this specific trade. We calculate your projected gains based on this number, so you can see your potential profit before you commit."
+                    position="right"
+                  />
+                </div>
                 <div className="text-xs text-slate-500">Available for position sizing</div>
               </div>
             </div>

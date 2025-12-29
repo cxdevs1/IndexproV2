@@ -2,6 +2,7 @@ import { TrendingUp, TrendingDown, Search, ChevronRight, X, BarChart3, DollarSig
 import { useState, useRef, useEffect } from 'react';
 import { VacancyMonitor } from './VacancyMonitor';
 import { useIsMobile } from './ui/use-mobile';
+import { MentorshipTooltip } from './MentorshipTooltip';
 
 interface Stock {
   ticker: string;
@@ -209,11 +210,10 @@ export function UniverseMonitor() {
       )}
 
       {/* The Board */}
-      <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
+      <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-visible">
         {/* Unified Header - Brand Identity */}
-        <div className="bg-gradient-to-br from-indigo-600 via-purple-600 to-purple-700 p-4 sm:p-5 relative overflow-hidden">
-          {/* Decorative gradient orbs */}
-          <div className="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full blur-3xl"></div>
+        <div className="bg-gradient-to-br from-indigo-600 via-purple-600 to-purple-700 p-4 sm:p-5 relative overflow-visible rounded-t-xl">{/* Decorative gradient orbs */}
+          <div className="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
           <div className="absolute -bottom-8 -left-8 w-32 h-32 bg-indigo-400/20 rounded-full blur-2xl"></div>
           
           <div className="relative z-10 flex items-center gap-3">
@@ -221,7 +221,14 @@ export function UniverseMonitor() {
               <BarChart3 className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
             </div>
             <div>
-              <h2 className="text-white font-semibold">The Board</h2>
+              <div className="flex items-center">
+                <h2 className="text-white font-semibold">The Board</h2>
+                <MentorshipTooltip 
+                  term="The Board"
+                  definition="The Board shows stocks being considered for S&P inclusion. Think of it like a waiting room—only the strongest companies make it here, and even fewer get promoted to the actual index."
+                  position="bottom"
+                />
+              </div>
               <p className="text-slate-300 text-xs">Live S&P Index Rankings</p>
             </div>
           </div>

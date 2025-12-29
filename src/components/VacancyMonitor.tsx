@@ -1,4 +1,5 @@
 import { AlertTriangle, Building2, TrendingDown, Sparkles } from 'lucide-react';
+import { MentorshipTooltip } from './MentorshipTooltip';
 
 interface Vacancy {
   ticker: string;
@@ -80,12 +81,12 @@ export function VacancyMonitor() {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden mb-6">
+    <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-visible mb-6">
       {/* Unified Header - Brand Identity */}
-      <div className="bg-gradient-to-br from-purple-600 via-indigo-600 to-indigo-700 p-5 relative overflow-hidden">
+      <div className="bg-gradient-to-br from-purple-600 via-indigo-600 to-indigo-700 p-5 relative overflow-visible rounded-t-xl">
         {/* Decorative gradient orbs */}
-        <div className="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full blur-3xl"></div>
-        <div className="absolute -bottom-6 -left-6 w-32 h-32 bg-purple-400/20 rounded-full blur-2xl"></div>
+        <div className="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div className="absolute -bottom-6 -left-6 w-32 h-32 bg-purple-400/20 rounded-full blur-2xl pointer-events-none"></div>
         
         <div className="relative z-10">
           <div className="flex items-center gap-3 mb-2">
@@ -93,7 +94,14 @@ export function VacancyMonitor() {
               <Building2 className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h3 className="text-white font-semibold">Index Vacancies</h3>
+              <div className="flex items-center gap-1">
+                <h3 className="text-white font-semibold">Index Vacancies</h3>
+                <MentorshipTooltip 
+                  term="Index Vacancies"
+                  definition="Index Vacancies are open spots created when companies get removed from an S&P index (due to acquisition, bankruptcy, or delisting). These vacancies must be filled—creating opportunities for the highest-scoring stocks on The Board to get promoted."
+                  position="bottom"
+                />
+              </div>
               <p className="text-indigo-100 text-xs">Potential inclusion opportunities</p>
             </div>
           </div>

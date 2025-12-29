@@ -1,6 +1,6 @@
 import { Activity, TrendingUp, Zap, AlertTriangle } from 'lucide-react';
 import { useState } from 'react';
-import { InstructionIcon } from './InstructionIcon';
+import { MentorshipTooltip } from './MentorshipTooltip';
 
 interface PropulsionGaugeProps {
   institutionalGravity: number; // 0-100 from AUM calculation
@@ -101,10 +101,10 @@ export function PropulsionGauge({
           <div>
             <div className="flex items-center">
               <h4 className="font-semibold text-slate-900">The Propulsion Gauge</h4>
-              <InstructionIcon
+              <MentorshipTooltip
                 term="Propulsion Score"
-                explanation="A combined metric showing how much buying pressure we expect. Higher scores = stronger potential for price gains when the stock is officially added to the index."
-                example="A score of 80+ means both passive funds AND short sellers will need to buy shares, creating exceptional upward pressure."
+                definition="A combined metric showing how much buying pressure we expect. Higher scores = stronger potential for price gains when the stock is officially added to the index. A score of 80+ means both passive funds AND short sellers will need to buy shares, creating exceptional upward pressure."
+                position="right"
               />
             </div>
             <p className="text-xs text-slate-500">Dual-axis squeeze intensity predictor</p>
@@ -272,10 +272,10 @@ export function PropulsionGauge({
               <label className="text-sm font-medium text-slate-700 flex items-center">
                 <Activity className="w-4 h-4 text-cyan-600 mr-2" />
                 Institutional Gravity (AUM)
-                <InstructionIcon
+                <MentorshipTooltip
                   term="Institutional Gravity"
-                  explanation="How much passive index funds will need to buy. When a stock joins an index, trillions in 'robot money' automatically buy shares to match the index."
-                  example="If AXON joins the S&P 600, every S&P 600 index fund must buy it. Higher AUM = more buying pressure."
+                  definition="How much passive index funds will need to buy. When a stock joins an index, trillions in 'robot money' automatically buy shares to match the index. If AXON joins the S&P 600, every S&P 600 index fund must buy it. Higher AUM = more buying pressure."
+                  position="right"
                 />
               </label>
               <span className="text-sm font-bold text-cyan-700">{institutionalGravity}%</span>
@@ -299,10 +299,10 @@ export function PropulsionGauge({
               <label className="text-sm font-medium text-slate-700 flex items-center">
                 <TrendingUp className="w-4 h-4 text-pink-600 mr-2" />
                 Exit Friction (SI% + DTC)
-                <InstructionIcon
+                <MentorshipTooltip
                   term="Exit Friction"
-                  explanation="How many short sellers will be forced to buy back shares. Short sellers bet against stocks. When the stock joins an index, they often panic and buy back their shares (covering), creating extra upward pressure."
-                  example="If 20% of shares are sold short, those shorts must buy back when inclusion is announced, adding fuel to the rally."
+                  definition="How many short sellers will be forced to buy back shares. Short sellers bet against stocks. When the stock joins an index, they often panic and buy back their shares (covering), creating extra upward pressure. If 20% of shares are sold short, those shorts must buy back when inclusion is announced, adding fuel to the rally."
+                  position="right"
                 />
               </label>
               <span className="text-sm font-bold text-pink-700">{exitFriction}%</span>

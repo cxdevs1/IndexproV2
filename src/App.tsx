@@ -4,7 +4,6 @@ import { StockIntelligence } from './components/StockIntelligence';
 import { TradeImpactSimulator } from './components/ScenarioLab';
 import { MobileNavigation } from './components/MobileNavigation';
 import { AlertSettingsModal } from './components/AlertSettingsModal';
-import { SpotlightMentorJourney } from './components/SpotlightMentorJourney';
 import { MobileOnboarding } from './components/MobileOnboarding';
 import { useIsMobile } from './components/ui/use-mobile';
 import { Bell, BookOpen } from 'lucide-react';
@@ -13,25 +12,15 @@ export default function App() {
   const isMobile = useIsMobile();
   const [mobileActiveTab, setMobileActiveTab] = useState<'board' | 'intelligence' | 'scenario'>('board');
   const [showAlertSettings, setShowAlertSettings] = useState(false);
-  const [showGuidedTour, setShowGuidedTour] = useState(false);
   const [showMobileOnboarding, setShowMobileOnboarding] = useState(false);
 
   // Check if user is new (first time visiting)
   useEffect(() => {
     const hasVisited = localStorage.getItem('indexPro_hasVisited');
-    if (!hasVisited) {
-      if (isMobile) {
-        setShowMobileOnboarding(true);
-      } else {
-        setShowGuidedTour(true);
-      }
+    if (!hasVisited && isMobile) {
+      setShowMobileOnboarding(true);
     }
   }, [isMobile]);
-
-  const handleTourComplete = () => {
-    localStorage.setItem('indexPro_hasVisited', 'true');
-    setShowGuidedTour(false);
-  };
 
   const handleOnboardingComplete = () => {
     localStorage.setItem('indexPro_hasVisited', 'true');
@@ -62,7 +51,7 @@ export default function App() {
               )}
               {/* Tutorial Replay Button */}
               <button
-                onClick={() => isMobile ? setShowMobileOnboarding(true) : setShowGuidedTour(true)}
+                onClick={() => setShowMobileOnboarding(true)}
                 className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-lg hover:bg-indigo-50 transition-colors group relative"
                 title="Quick Start Guide"
               >
@@ -139,12 +128,6 @@ export default function App() {
       <AlertSettingsModal
         isOpen={showAlertSettings}
         onClose={() => setShowAlertSettings(false)}
-      />
-
-      {/* Guided Tour */}
-      <SpotlightMentorJourney
-        isOpen={showGuidedTour}
-        onClose={handleTourComplete}
       />
 
       {/* Mobile Onboarding */}
