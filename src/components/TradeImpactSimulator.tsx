@@ -1,6 +1,7 @@
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, ReferenceLine } from 'recharts';
 import { TrendingUp, TrendingDown, Target, Sparkles, Info, ArrowUpRight, ArrowDownRight, Wallet, DollarSign, AlertTriangle, Shield, Zap, Flame, Activity, Award } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { useIsMobile } from './ui/use-mobile';
 
 interface HistoricalComp {
   ticker: string;

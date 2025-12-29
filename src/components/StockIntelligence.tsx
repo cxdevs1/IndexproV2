@@ -1,6 +1,7 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
 import { CheckCircle2, XCircle, AlertCircle, TrendingUp, ShieldAlert, ShieldCheck, Info, CircleDot, Circle, DollarSign, BarChart3, Droplets, Building2, Wallet, Activity } from 'lucide-react';
 import { useState } from 'react';
+import { useIsMobile } from './ui/use-mobile';
 
 const scoreData = [
   { date: 'Jan 15', score: 72 },
@@ -34,6 +35,7 @@ const committeeChecklist: ChecklistItem[] = [
 ];
 
 export function StockIntelligence() {
+  const isMobile = useIsMobile();
   const currentStock = 'AXON';
   const currentCompany = 'Axon Enterprise';
   const currentPrice = 342.18;

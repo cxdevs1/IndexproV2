@@ -36,6 +36,7 @@ export function UniverseMonitor() {
   const [selectedIndex, setSelectedIndex] = useState<IndexFilter>('All');
   const [selectedStock, setSelectedStock] = useState<Stock | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [expandedStock, setExpandedStock] = useState<string | null>(null);
   const carouselRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
 

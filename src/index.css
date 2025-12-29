@@ -198,6 +198,7 @@
     --blur-sm: 8px;
     --blur-md: 12px;
     --blur-lg: 16px;
+    --blur-xl: 24px;
     --blur-2xl: 40px;
     --blur-3xl: 64px;
     --default-transition-duration: .15s;
@@ -760,6 +761,10 @@
     display: inline-block;
   }
 
+  .h-1 {
+    height: calc(var(--spacing) * 1);
+  }
+
   .h-1\.5 {
     height: calc(var(--spacing) * 1.5);
   }
@@ -850,6 +855,10 @@
 
   .max-h-\[calc\(90vh-180px\)\] {
     max-height: calc(90vh - 180px);
+  }
+
+  .min-h-\[44px\] {
+    min-height: 44px;
   }
 
   .min-h-screen {
@@ -1189,6 +1198,11 @@
     border-top-right-radius: var(--radius-2xl);
   }
 
+  .rounded-b-full {
+    border-bottom-right-radius: 3.40282e38px;
+    border-bottom-left-radius: 3.40282e38px;
+  }
+
   .border {
     border-style: var(--tw-border-style);
     border-width: 1px;
@@ -1351,6 +1365,16 @@
 
   .border-slate-200 {
     border-color: var(--color-slate-200);
+  }
+
+  .border-slate-200\/50 {
+    border-color: color-mix(in srgb, oklch(.929 .013 255.508) 50%, transparent);
+  }
+
+  @supports (color: color-mix(in lab, red, red)) {
+    .border-slate-200\/50 {
+      border-color: color-mix(in oklab, var(--color-slate-200) 50%, transparent);
+    }
   }
 
   .border-slate-300 {
@@ -2610,6 +2634,12 @@
     backdrop-filter: var(--tw-backdrop-blur, ) var(--tw-backdrop-brightness, ) var(--tw-backdrop-contrast, ) var(--tw-backdrop-grayscale, ) var(--tw-backdrop-hue-rotate, ) var(--tw-backdrop-invert, ) var(--tw-backdrop-opacity, ) var(--tw-backdrop-saturate, ) var(--tw-backdrop-sepia, );
   }
 
+  .backdrop-blur-xl {
+    --tw-backdrop-blur: blur(var(--blur-xl));
+    -webkit-backdrop-filter: var(--tw-backdrop-blur, ) var(--tw-backdrop-brightness, ) var(--tw-backdrop-contrast, ) var(--tw-backdrop-grayscale, ) var(--tw-backdrop-hue-rotate, ) var(--tw-backdrop-invert, ) var(--tw-backdrop-opacity, ) var(--tw-backdrop-saturate, ) var(--tw-backdrop-sepia, );
+    backdrop-filter: var(--tw-backdrop-blur, ) var(--tw-backdrop-brightness, ) var(--tw-backdrop-contrast, ) var(--tw-backdrop-grayscale, ) var(--tw-backdrop-hue-rotate, ) var(--tw-backdrop-invert, ) var(--tw-backdrop-opacity, ) var(--tw-backdrop-saturate, ) var(--tw-backdrop-sepia, );
+  }
+
   .transition-all {
     transition-property: all;
     transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
@@ -2874,6 +2904,10 @@
     --tw-scale-y: 95%;
     --tw-scale-z: 95%;
     scale: var(--tw-scale-x) var(--tw-scale-y);
+  }
+
+  .active\:bg-slate-50:active {
+    background-color: var(--color-slate-50);
   }
 
   .active\:bg-slate-100:active {
